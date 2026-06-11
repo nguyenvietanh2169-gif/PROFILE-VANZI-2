@@ -10,7 +10,6 @@ const imgHuman = document.getElementById('img-human');
 const imgRobot = document.getElementById('img-robot');
 const scannerRing = document.getElementById('scanner-ring-elem');
 const coordsDisplay = document.getElementById('coords-display');
-const particleCanvas = document.getElementById('particle-canvas');
 const soundToggle = document.getElementById('sound-toggle');
 const waveformContainer = document.getElementById('waveform-visualizer');
 const navLinks = document.querySelectorAll('.nav-link');
@@ -54,27 +53,7 @@ imgRobot.style.transform = `translate(${offsetXPercent}%, ${offsetYPercent}%) sc
 imgHuman.style.clipPath = `inset(0% 0% ${cropBottomPercent}% 0%)`;
 imgHuman.style.webkitClipPath = `inset(0% 0% ${cropBottomPercent}% 0%)`;
 
-// 3. Canvas Setup
-const ctx = particleCanvas.getContext('2d');
-let particles = [];
 
-function resizeCanvas() {
-  const rect = container.getBoundingClientRect();
-  const isMobile = window.innerWidth <= 600;
-  
-  if (isMobile) {
-    // 50% resolution on mobile to save 75% pixel rendering overhead
-    particleCanvas.width = rect.width * 0.5;
-    particleCanvas.height = rect.height * 0.5;
-    ctx.scale(0.5, 0.5);
-  } else {
-    particleCanvas.width = rect.width;
-    particleCanvas.height = rect.height;
-  }
-}
-resizeCanvas();
-// Handle resize
-window.addEventListener('resize', resizeCanvas);
 
 // 4. Mouse and Touch Event Listeners
 function updateCoordinates(clientX, clientY) {
@@ -149,75 +128,8 @@ container.addEventListener('touchend', () => {
 });
 
 
-// 5. Cyber Particle System
-class Particle {
-  constructor(x, y, angle) {
-    this.x = x;
-    this.y = y;
-    // Velocity: burst outwards from the perimeter of the scanning circle
-    const speed = 0.3 + Math.random() * 1.2;
-    this.vx = Math.cos(angle) * speed + (Math.random() - 0.5) * 0.3;
-    this.vy = Math.sin(angle) * speed + (Math.random() - 0.5) * 0.3;
-    
-    this.size = 1 + Math.random() * 2;
-    this.maxLife = 15 + Math.random() * 20;
-    this.life = this.maxLife;
-    // Glowing cool white and light blue particles matching blue sky
-    this.color = Math.random() > 0.4 ? '#ffffff' : '#76c0d0';
-  }
+// 5. Interactive Animation Loop
 
-  update() {
-    this.x += this.vx;
-    this.y += this.vy;
-    this.vx *= 0.94; // slightly higher drag for subtle drift
-    this.vy *= 0.94;
-    this.life--;
-  }
-
-  draw() {
-    const opacity = this.life / this.maxLife;
-    ctx.fillStyle = this.color;
-    ctx.globalAlpha = opacity * 0.7; // soft glowing sparks
-    ctx.fillRect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
-  }
-}
-
-function spawnParticles(x, y, radius, count) {
-  if (radius < 10) return;
-  // Throttle particles on mobile viewports
-  const isMobile = window.innerWidth <= 600;
-  const actualCount = isMobile ? Math.ceil(count * 0.3) : count;
-  
-  for (let i = 0; i < actualCount; i++) {
-    // Generate a random angle around the circle
-    const angle = Math.random() * Math.PI * 2;
-    const px = x + Math.cos(angle) * radius;
-    const py = y + Math.sin(angle) * radius;
-    particles.push(new Particle(px, py, angle));
-  }
-}
-
-function updateAndDrawParticles() {
-  // Clear the entire canvas using identity transform to work correctly under scales
-  ctx.save();
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
-  ctx.restore();
-  
-  ctx.globalCompositeOperation = 'source-over'; // draw normally over white background
-  
-  particles.forEach((p, index) => {
-    p.update();
-    p.draw();
-    if (p.life <= 0) {
-      particles.splice(index, 1);
-    }
-  });
-  
-  ctx.globalAlpha = 1.0;
-}
-
-// 6. Interactive Animation Loop
 function animate() {
   // Linear Interpolation (LERP) formula: current += (target - current) * factor
   current.x += (target.x - current.x) * lerpFactor;
@@ -236,12 +148,6 @@ function animate() {
     scannerRing.style.top = `${current.y}px`;
     scannerRing.style.width = `${scanRadius.current * 2}px`;
     scannerRing.style.height = `${scanRadius.current * 2}px`;
-    
-    // Spawn digital sparks at the border of reveal circle when scanning is active
-    if (isHovering && mouseSpeed > 1) {
-      const spawnCount = Math.min(Math.floor(mouseSpeed / 3), 4);
-      spawnParticles(current.x, current.y, scanRadius.current, spawnCount);
-    }
   } else {
     scannerRing.style.display = 'none';
   }
@@ -269,11 +175,8 @@ function animate() {
     container.style.transform = 'none'; // Completely clear the transform to restore 2D pixel sharpness
   }
 
-  // Update particle engine
-  updateAndDrawParticles();
-
-  // Check if animation should continue running
-  const needsMoreFrames = isHovering || (scanRadius.current > 0.1) || (particles.length > 0);
+  // Check if animation should continue running (no particles anymore)
+  const needsMoreFrames = isHovering || (scanRadius.current > 0.1);
   
   if (needsMoreFrames) {
     requestAnimationFrame(animate);
@@ -286,11 +189,6 @@ function animate() {
     if (coordsDisplay) {
       coordsDisplay.textContent = 'SYS.COORD: STANDBY';
     }
-    // Clear canvas completely
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
-    ctx.restore();
   }
 }
 
@@ -305,7 +203,7 @@ let audioCtx = null;
 let soundOn = false;
 
 // Custom audio file tags (loaded dynamically to prevent load delays)
-const introAudio = new Audio('/src/assets/intro.mp3');
+const introAudio = new Audio('/intro.mp3');
 introAudio.crossOrigin = "anonymous";
 
 let introSource = null;
@@ -593,10 +491,15 @@ function enterExperience() {
   }, 1200);
 }
 
-// Click to initiate system and play intro audio
-btnInitiate.addEventListener('click', () => {
-  // Setup audio context
+// Click or Touch to initiate system and play intro audio (with proper AudioContext unlocking for iOS Safari)
+const handleInitiate = () => {
+  if (audioCtx) return; // Prevent double-triggering
+  
+  // Setup and resume audio context to unlock Web Audio on iOS Safari
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
   
   // Hide the initiation button container completely immediately
   introEntry.style.display = 'none';
@@ -607,6 +510,12 @@ btnInitiate.addEventListener('click', () => {
   // Play intro audio and start beat animation loop
   playIntroAudio(audioCtx, enterExperience);
   animateIntroLogo();
-});
+};
+
+btnInitiate.addEventListener('click', handleInitiate);
+btnInitiate.addEventListener('touchstart', (e) => {
+  e.preventDefault(); // Prevent simulated click event to avoid double trigger
+  handleInitiate();
+}, { passive: false });
 
 
