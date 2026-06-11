@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VANZI // Visual Portrait Profile</title>
+    
+    <!-- Google Fonts: Inter for clean typography, Outfit for headings -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body class="intro-active">
+    <!-- SVG Utility Filter for Environmental Color Grading (preserves skin tones and limits blend to image alpha channel) -->
+    <svg style="width: 0; height: 0; position: absolute;" aria-hidden="true">
+      <filter id="ambient-tint">
+        <feFlood flood-color="#5eaec0" flood-opacity="0.14" result="blue-flood" />
+        <feComposite in="blue-flood" in2="SourceGraphic" operator="in" result="tinted-image" />
+        <feBlend mode="soft-light" in="tinted-image" in2="SourceGraphic" />
+      </filter>
+    </svg>
+
+    <div id="app">
+      <!-- Full-screen Intro Gate Overlay -->
+      <div id="intro-gate" class="intro-gate">
+        <!-- Slices of the background sheet (unified visually but split physically) -->
+        <div class="intro-slice slice-1"></div>
+        <div class="intro-slice slice-2"></div>
+        <div class="intro-slice slice-3"></div>
+        
+        <!-- SVG for drawing parallel diagonal cutting lines -->
+        <svg class="intro-slash-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <line x1="70" y1="0" x2="0" y2="70" class="slash-line line-1" />
+          <line x1="100" y1="30" x2="30" y2="100" class="slash-line line-2" />
+        </svg>
+
+        <div class="intro-content">
+          <!-- User Logo -->
+          <div class="intro-logo-container">
+            <img src="/src/assets/logo.png" alt="VANZI Logo" class="intro-logo logo-main" />
+          </div>
+          
+          <!-- Entry Controls (Visible Initially) -->
+          <div id="intro-entry" class="intro-entry">
+            <button id="btn-initiate" class="btn-initiate">
+              <span class="btn-glow"></span>
+              <span class="btn-text">START</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- First Page Wrapper (Constrains Header + Portrait to exactly 100vh) -->
+      <div class="first-page" id="scanner">
+        <!-- Minimal Header -->
+        <header class="navbar">
+          <div class="logo-container">
+            <a href="#" class="logo">VANZI</a>
+          </div>
+          
+          <!-- Centered Pill Nav -->
+          <div class="nav-pill-wrapper">
+            <nav class="nav-pill">
+              <a href="#scanner" class="nav-link active">Scanner</a>
+              <a href="#releases" class="nav-link">Releases</a>
+              <a href="#tour" class="nav-link">Tour Dates</a>
+            </nav>
+          </div>
+          
+          <!-- Right Controls -->
+          <div class="nav-controls">
+            <button id="sound-toggle" class="btn-sound" aria-label="Toggle Sound">
+              <span class="sound-icon"></span>
+              <span class="sound-text">Audio: Off</span>
+            </button>
+            <a href="#book" class="btn-cta">Book Now</a>
+          </div>
+        </header>
+
+        <!-- Giant Background Heading (3D Rotating Box) -->
+        <div class="hero-bg-text">
+          <div class="text-3d-box-container">
+            <div class="text-3d-box">
+              <div class="box-face face-front">VANZI ON DA BEAT</div>
+              <div class="box-face face-top">VANZI ON DA BEAT</div>
+              <div class="box-face face-back">VANZI ON DA BEAT</div>
+              <div class="box-face face-bottom">VANZI ON DA BEAT</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Left-Bottom Description Overlay -->
+        <div class="hero-overlay-left">
+          <p>// I'M VANZI — A FUTURISTIC MUSIC PRODUCER & DJ<br>
+             CRAFTING DIGITAL SONIC LANDSCAPES & HIGH-ENERGY<br>
+             EXPERIENCES FOR THE NEXT GENERATION.</p>
+        </div>
+
+        <!-- Right-Middle Callout Overlay -->
+        <div class="hero-overlay-right">
+          <p>// SOUNDS THAT<br>
+             DEFINE THE FUTURE</p>
+        </div>
+
+        <!-- Bottom Sponsors/Logos Bar -->
+        <div class="hero-logos-bar">
+          <span>PIONEER</span>
+          <span>ABLETON</span>
+          <span>SOUNDCLOUD</span>
+          <span>SPOTIFY</span>
+          <span>BEATPORT</span>
+        </div>
+
+        <!-- Main Profile Section (Centered and Flush Bottom) -->
+        <main class="main-content">
+          <div class="profile-layout">
+            <!-- Center: Centered Interactive Image Scanner -->
+            <div class="profile-visual" id="scanner-section">
+              <div class="image-viewer" id="image-viewer-container">
+                <!-- Human layer (visible by default) -->
+                <img src="/src/assets/human.png" alt="DJ VANZI Human Form" class="viewer-img img-human" id="img-human" draggable="false" />
+                
+                <!-- Robot layer (revealed around cursor) -->
+                <img src="/src/assets/robot.png" alt="DJ VANZI Cybernetic Form" class="viewer-img img-robot" id="img-robot" draggable="false" />
+                
+                <!-- Particles canvas overlay -->
+                <canvas id="particle-canvas" class="particle-overlay"></canvas>
+
+                <!-- Minimalist Transparent Scanner Ring -->
+                <div class="scanner-ring" id="scanner-ring-elem">
+                  <div class="scanner-inner"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      <!-- Second Page Section (Blank placeholder for future content) -->
+      <section id="releases" class="second-page">
+        <div class="page-2-content">
+          <h2>RELEASES</h2>
+          <p>Nội dung đang được cập nhật. Bạn có thể thêm nhạc hoặc các sản phẩm âm nhạc mới ở đây sau.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Main Module Script -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
