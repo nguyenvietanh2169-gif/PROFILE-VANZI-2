@@ -31,6 +31,14 @@ let isHovering = false;
 let mouseSpeed = 0;
 let lastMousePos = { x: 0, y: 0 };
 
+let isLoopRunning = false;
+function startLoop() {
+  if (!isLoopRunning) {
+    isLoopRunning = true;
+    animate();
+  }
+}
+
 // 2.5 Developer Alignment Offsets (Calibrated values, saved as pixels of 940x788 resolution)
 let offsetX = 5;
 let offsetY = 11;
@@ -85,6 +93,8 @@ container.addEventListener('mousemove', (e) => {
   const dy = target.y - lastMousePos.y;
   mouseSpeed = Math.sqrt(dx * dx + dy * dy);
   lastMousePos = { x: target.x, y: target.y };
+  
+  startLoop();
 });
 
 container.addEventListener('mouseenter', (e) => {
@@ -94,6 +104,8 @@ container.addEventListener('mouseenter', (e) => {
   // Set current to target immediately on enter to prevent lag from center
   current.x = target.x;
   current.y = target.y;
+  
+  startLoop();
 });
 
 container.addEventListener('mouseleave', () => {
@@ -113,6 +125,8 @@ container.addEventListener('touchmove', (e) => {
     const dy = target.y - lastMousePos.y;
     mouseSpeed = Math.sqrt(dx * dx + dy * dy);
     lastMousePos = { x: target.x, y: target.y };
+    
+    startLoop();
   }
 }, { passive: true });
 
@@ -123,6 +137,8 @@ container.addEventListener('touchstart', (e) => {
     updateCoordinates(e.touches[0].clientX, e.touches[0].clientY);
     current.x = target.x;
     current.y = target.y;
+    
+    startLoop();
   }
 }, { passive: true });
 
@@ -232,7 +248,7 @@ function animate() {
 
   // Update Coordinates in HUD (Only if element exists)
   if (coordsDisplay) {
-    if (isHovering || scanRadius.current > 1) {
+    if (isHovering && scanRadius.current > 1) {
       const displayX = Math.round(current.x).toString().padStart(3, '0');
       const displayY = Math.round(current.y).toString().padStart(3, '0');
       coordsDisplay.textContent = `SYS.COORD: X: ${displayX} | Y: ${displayY}`;
@@ -256,10 +272,29 @@ function animate() {
   // Update particle engine
   updateAndDrawParticles();
 
-  requestAnimationFrame(animate);
+  // Check if animation should continue running
+  const needsMoreFrames = isHovering || (scanRadius.current > 0.1) || (particles.length > 0);
+  
+  if (needsMoreFrames) {
+    requestAnimationFrame(animate);
+  } else {
+    // Reset to complete standby state to save resource consumption
+    isLoopRunning = false;
+    imgRobot.style.clipPath = 'circle(0px at 0px 0px)';
+    imgRobot.style.webkitClipPath = 'circle(0px at 0px 0px)';
+    scannerRing.style.display = 'none';
+    if (coordsDisplay) {
+      coordsDisplay.textContent = 'SYS.COORD: STANDBY';
+    }
+    // Clear canvas completely
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+    ctx.restore();
+  }
 }
 
-// Start visual frame loop
+// Start visual frame loop once (will auto-suspend itself immediately if not hovered)
 animate();
 
 

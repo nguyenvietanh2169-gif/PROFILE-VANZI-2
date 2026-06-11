@@ -1012,4 +1012,22 @@ body.intro-active {
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.4) !important;
     box-shadow: none !important;
   }
+
+  /* Flatten 3D rotating box to static 2D on mobile to eliminate animation/GPU overhead */
+  .text-3d-box {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .face-top,
+  .face-back,
+  .face-bottom {
+    display: none !important;
+  }
+
+  .face-front {
+    transform: none !important;
+    background: transparent !important;
+    border: none !important;
+  }
 }
