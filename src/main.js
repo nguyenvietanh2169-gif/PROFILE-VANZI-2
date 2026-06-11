@@ -52,8 +52,17 @@ let particles = [];
 
 function resizeCanvas() {
   const rect = container.getBoundingClientRect();
-  particleCanvas.width = rect.width;
-  particleCanvas.height = rect.height;
+  const isMobile = window.innerWidth <= 600;
+  
+  if (isMobile) {
+    // 50% resolution on mobile to save 75% pixel rendering overhead
+    particleCanvas.width = rect.width * 0.5;
+    particleCanvas.height = rect.height * 0.5;
+    ctx.scale(0.5, 0.5);
+  } else {
+    particleCanvas.width = rect.width;
+    particleCanvas.height = rect.height;
+  }
 }
 resizeCanvas();
 // Handle resize
@@ -159,7 +168,11 @@ class Particle {
 
 function spawnParticles(x, y, radius, count) {
   if (radius < 10) return;
-  for (let i = 0; i < count; i++) {
+  // Throttle particles on mobile viewports
+  const isMobile = window.innerWidth <= 600;
+  const actualCount = isMobile ? Math.ceil(count * 0.3) : count;
+  
+  for (let i = 0; i < actualCount; i++) {
     // Generate a random angle around the circle
     const angle = Math.random() * Math.PI * 2;
     const px = x + Math.cos(angle) * radius;
@@ -169,7 +182,12 @@ function spawnParticles(x, y, radius, count) {
 }
 
 function updateAndDrawParticles() {
+  // Clear the entire canvas using identity transform to work correctly under scales
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+  ctx.restore();
+  
   ctx.globalCompositeOperation = 'source-over'; // draw normally over white background
   
   particles.forEach((p, index) => {

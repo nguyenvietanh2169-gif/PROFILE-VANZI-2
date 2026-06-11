@@ -313,6 +313,7 @@ body.intro-active {
   margin: 0 auto;
   user-select: none;
   z-index: 10;
+  touch-action: none; /* Block touch gestures to prevent background scrolling during scanner drag */
   
   /* Smooth vertical fade-out at the bottom of the portrait to blend with the background.
      Placed here on the parent to remain stable during child 3D tilt hover animations. */
@@ -328,6 +329,7 @@ body.intro-active {
   /* overflow: hidden; -- Removed to prevent clipping of image drop-shadow at container boundaries */
   /* border-radius: 12px 12px 0 0; -- Removed as images are transparent silhouettes and don't need a rounded container box */
   cursor: none; /* Hide standard cursor for the scanner ring */
+  touch-action: none; /* Block touch gestures to prevent background scrolling during scanner drag */
   
   /* Transparent background so portrait floats directly on top of the screen gradient */
   background-color: transparent;
@@ -985,5 +987,29 @@ body.intro-active {
   .btn-initiate {
     padding: 15px 30px;
     font-size: 0.85rem;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(17, 76, 87, 0.95) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+  }
+
+  /* Disable heavy backdrop-filter blur on mobile to resolve iOS Safari GPU bottlenecks */
+  .nav-pill,
+  .btn-sound {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(17, 76, 87, 0.95) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+  }
+
+  .intro-slice {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Reduce glowing text-shadow on rolling 3D box faces to prevent continuous mobile page re-rasterization */
+  .box-face {
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.4) !important;
+    box-shadow: none !important;
   }
 }
