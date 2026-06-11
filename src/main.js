@@ -201,12 +201,24 @@ animate();
 // ==========================================================================
 let audioCtx = null;
 let soundOn = false;
+let introDuration = 9.0; // Fallback duration
 
 // Custom audio file tags (loaded dynamically to prevent load delays)
 const introAudio = new Audio('/intro.mp3');
 introAudio.crossOrigin = "anonymous";
 
-let introSource = null;
+// Pre-fetch intro audio in the background
+async function prefetchIntroAudio() {
+  try {
+    const response = await fetch('/intro.mp3');
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    window.introArrayBuffer = await response.arrayBuffer();
+    console.log("Intro audio pre-fetched successfully.");
+  } catch (err) {
+    console.error("Failed to prefetch intro audio:", err);
+  }
+}
+prefetchIntroAudio();
 
 function initAudio() {
   if (!audioCtx) {
@@ -328,37 +340,64 @@ let isIntroActive = true;
 let introTimeout = null;
 let introAnalyser = null;
 let introAnimationId = null;
+let introSourceNode = null;
 
-function playIntroAudio(ctx, onComplete) {
-  if (!introSource) {
-    try {
-      introSource = ctx.createMediaElementSource(introAudio);
-      introAnalyser = ctx.createAnalyser();
-      introAnalyser.fftSize = 64;
-      introSource.connect(introAnalyser);
-      introAnalyser.connect(ctx.destination);
-    } catch (e) {
-      console.warn("Intro audio context routing warning:", e);
+async function playIntroAudio(ctx, onComplete) {
+  try {
+    let arrayBuffer;
+    if (window.introArrayBuffer) {
+      arrayBuffer = window.introArrayBuffer.slice(0); // slice to clone because decodeAudioData consumes the buffer
+    } else {
+      console.log("Audio buffer not pre-fetched yet. Fetching now...");
+      const response = await fetch('/intro.mp3');
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      arrayBuffer = await response.arrayBuffer();
     }
+    
+    const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+    introDuration = audioBuffer.duration;
+    console.log("Decoded audio duration:", introDuration);
+    
+    introSourceNode = ctx.createBufferSource();
+    introSourceNode.buffer = audioBuffer;
+    
+    introAnalyser = ctx.createAnalyser();
+    introAnalyser.fftSize = 64;
+    
+    introSourceNode.connect(introAnalyser);
+    introAnalyser.connect(ctx.destination);
+    
+    introSourceNode.start(0);
+    
+    introSourceNode.onended = () => {
+      onComplete();
+    };
+    
+    introTimeout = setTimeout(onComplete, (introDuration + 0.2) * 1000);
+    
+  } catch (err) {
+    console.warn("Web Audio playback failed, falling back to HTML5 Audio:", err);
+    playIntroAudioFallback(onComplete);
   }
-  
+}
+
+function playIntroAudioFallback(onComplete) {
   introAudio.currentTime = 0;
-  introAudio.play().catch(err => {
-    console.warn("Intro music file (/src/assets/intro.mp3) not found. Proceeding silently.", err);
+  introAudio.play().then(() => {
+    if (introAudio.duration && !isNaN(introAudio.duration)) {
+      introDuration = introAudio.duration;
+    }
+  }).catch(err => {
+    console.warn("HTML5 audio playback failed:", err);
+    onComplete();
   });
-  
-  // Audio duration fallback: 15 seconds
-  let duration = 15;
-  if (introAudio.duration && !isNaN(introAudio.duration)) {
-    duration = introAudio.duration;
-  }
   
   introAudio.onended = () => {
     onComplete();
   };
   
-  // Set safety timeout in case audio fails to load or play
-  introTimeout = setTimeout(onComplete, duration * 1000);
+  const timeoutDuration = (introAudio.duration && !isNaN(introAudio.duration)) ? introAudio.duration : 9.0;
+  introTimeout = setTimeout(onComplete, (timeoutDuration + 0.2) * 1000);
 }
 
 // State variables for dynamic logo movement & scaling
@@ -398,11 +437,11 @@ function animateIntroLogo() {
   const now = Date.now();
   const elapsed = (now - startTime) / 1000;
   
-  // Get actual music duration or fallback to 9.0 seconds
-  const duration = (introAudio.duration && !isNaN(introAudio.duration) && introAudio.duration > 0) ? introAudio.duration : 9.0;
+  // Get actual music duration
+  const duration = introDuration;
   
-  // Use audio currentTime if playing, else fallback to elapsed timer
-  const progressTime = (introAudio.currentTime > 0) ? introAudio.currentTime : elapsed;
+  // Use elapsed timer as progress time (most accurate and consistent for Web Audio source node)
+  const progressTime = elapsed;
   
   // Define transition phases near the end of the song
   const isOutroPhase1 = progressTime >= (duration - 5.1); // Drawing lines & Snap logo (last 5.1s)
@@ -472,6 +511,11 @@ function enterExperience() {
   isIntroActive = false;
   
   // Stop and clear intro audio
+  if (introSourceNode) {
+    try {
+      introSourceNode.stop();
+    } catch (e) {}
+  }
   introAudio.pause();
   introAudio.currentTime = 0;
   
@@ -492,13 +536,23 @@ function enterExperience() {
 }
 
 // Click or Touch to initiate system and play intro audio (with proper AudioContext unlocking for iOS Safari)
-const handleInitiate = () => {
+const handleInitiate = async () => {
   if (audioCtx) return; // Prevent double-triggering
   
   // Setup and resume audio context to unlock Web Audio on iOS Safari
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  
+  // Set audio session category to playback to override the hardware mute switch on iOS
+  if (navigator.audioSession) {
+    try {
+      navigator.audioSession.type = 'playback';
+    } catch (e) {
+      console.warn("Could not set audio session category:", e);
+    }
+  }
+  
   if (audioCtx.state === 'suspended') {
-    audioCtx.resume();
+    await audioCtx.resume();
   }
   
   // Hide the initiation button container completely immediately
