@@ -1422,6 +1422,7 @@ body.intro-active {
 }
 
 .playlist-card {
+  background: #dbe7eb;
   padding: 1rem;
   border-radius: 20px;
   cursor: pointer;
@@ -1429,10 +1430,13 @@ body.intro-active {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  box-shadow: 4px 4px 9px rgba(155, 178, 184, 0.85), -4px -4px 9px rgba(255, 255, 255, 0.95);
+  transition: all 0.2s ease;
 }
 
 .playlist-card:hover {
   transform: translateY(-2px);
+  box-shadow: 5px 5px 12px rgba(155, 178, 184, 0.85), -5px -5px 12px rgba(255, 255, 255, 0.95);
 }
 
 .playlist-card.active {
@@ -1583,11 +1587,11 @@ body.intro-active {
 
 @media (max-width: 480px) {
   .second-page {
-    padding: 3rem 1rem;
+    padding: 2.5rem 0.75rem;
   }
   
   .neu-flat {
-    padding: 1.5rem;
+    padding: 1.25rem;
   }
   
   .player-body {
@@ -1601,6 +1605,34 @@ body.intro-active {
     width: 100%;
     justify-content: space-around;
     padding: 0.6rem 1rem;
+  }
+
+  .disc-container {
+    width: 210px;
+    height: 210px;
+  }
+
+  .cd-disc {
+    width: 180px;
+    height: 180px;
+  }
+
+  .top-tracks-avatars {
+    gap: 0.6rem;
+    justify-content: space-between;
+  }
+
+  .top-tracks-avatars .avatar-item {
+    width: 40px;
+    height: 40px;
+  }
+
+  .popular-playlists {
+    gap: 0.8rem;
+  }
+
+  .playlist-card {
+    padding: 0.75rem;
   }
 }
 
