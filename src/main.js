@@ -491,15 +491,15 @@ function animateIntroLogo() {
     bassNorm = bass / 255;
     volNorm = avgVolume / 255;
     
-    if (bassNorm > 0.6 && now - lastTargetChange > 90) {
-      // Fast, strong jumps on heavy beats
-      const maxOffset = 200;
+    if (bassNorm > 0.72 && now - lastTargetChange > 320) {
+      // Stronger but much sparser kicks
+      const maxOffset = 95;
       logoPos.targetX = (Math.random() - 0.5) * maxOffset;
       logoPos.targetY = (Math.random() - 0.5) * maxOffset;
       lastTargetChange = now;
-    } else if (now - lastTargetChange > 400) {
-      // Faster drifting when music is quieter
-      const maxOffset = 70;
+    } else if (now - lastTargetChange > 1200) {
+      // Slow, atmospheric drifting when quiet
+      const maxOffset = 30;
       logoPos.targetX = (Math.random() - 0.5) * maxOffset;
       logoPos.targetY = (Math.random() - 0.5) * maxOffset;
       lastTargetChange = now;
@@ -519,13 +519,13 @@ function animateIntroLogo() {
   } else if (isMobilePhone) {
     positionLerp = 0.04; // Very low interpolation step: extremely light on CPU
   } else {
-    positionLerp = 0.12 + bassNorm * 0.22; // Snappy, high-velocity movement on computers
+    positionLerp = 0.06 + bassNorm * 0.08; // Smooth, premium responsiveness on computers
   }
   
   logoPos.x += (logoPos.targetX - logoPos.x) * positionLerp;
   logoPos.y += (logoPos.targetY - logoPos.y) * positionLerp;
   
-  // 2. Dynamic global scaling (pulsing up to 1.8x on desktop, 1.08x on mobile, shrinks to 0 during outro)
+  // 2. Dynamic global scaling (pulsing up to 1.4x on desktop, 1.08x on mobile, shrinks to 0 during outro)
   let targetScale;
   if (isOutroPhase2) {
     targetScale = 0;
@@ -534,11 +534,11 @@ function animateIntroLogo() {
     const timeBeat = Math.sin(progressTime * 2.5 * Math.PI) > 0.6 ? 0.06 : 0;
     targetScale = 1.0 + timeBeat;
   } else {
-    // Desktop/iPad: strong dynamic scaling
-    targetScale = 1.0 + bassNorm * 0.6 + volNorm * 0.2;
+    // Desktop/iPad: elegant, moderate dynamic scaling
+    targetScale = 1.0 + bassNorm * 0.28 + volNorm * 0.12;
   }
   
-  const scaleLerp = isOutroPhase2 ? 0.05 : (isMobilePhone ? 0.12 : 0.18);
+  const scaleLerp = isOutroPhase2 ? 0.05 : (isMobilePhone ? 0.12 : 0.14);
   logoScale.current += (targetScale - logoScale.current) * scaleLerp;
   
   if (logoContainer) {
