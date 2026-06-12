@@ -447,6 +447,8 @@ function animateIntroLogo() {
   const isOutroPhase1 = progressTime >= (duration - 5.1); // Drawing lines & Snap logo (last 5.1s)
   const isOutroPhase2 = progressTime >= (duration - 3.9); // Slide slices & Fade logo (last 3.9s)
   
+  const isMobilePhone = window.innerWidth <= 600;
+
   if (isOutroPhase1) {
     if (!introGate.classList.contains('draw-lines')) {
       introGate.classList.add('draw-lines');
@@ -455,18 +457,30 @@ function animateIntroLogo() {
     logoPos.targetX = 0;
     logoPos.targetY = 0;
     lastTargetChange = Infinity;
-  } else if (bassNorm > 0.65 && now - lastTargetChange > 250) {
-    // Jump rapidly to a new location on heavy beats
-    const maxOffset = window.innerWidth < 600 ? 50 : 130;
-    logoPos.targetX = (Math.random() - 0.5) * maxOffset * 2.2;
-    logoPos.targetY = (Math.random() - 0.5) * maxOffset * 2.2;
-    lastTargetChange = now;
-  } else if (now - lastTargetChange > 1000) {
-    // Slow drifting if there are no heavy beats
-    const maxOffset = window.innerWidth < 600 ? 25 : 55;
-    logoPos.targetX = (Math.random() - 0.5) * maxOffset * 2;
-    logoPos.targetY = (Math.random() - 0.5) * maxOffset * 2;
-    lastTargetChange = now;
+  } else if (isMobilePhone) {
+    // Mobile Phone: gentle wiggling to prevent lag
+    if (now - lastTargetChange > 150) {
+      // Gentle vibration synchronized with bass hits
+      const wiggleAmt = bassNorm > 0.6 ? 6 : 2;
+      logoPos.targetX = (Math.random() - 0.5) * wiggleAmt;
+      logoPos.targetY = (Math.random() - 0.5) * wiggleAmt;
+      lastTargetChange = now;
+    }
+  } else {
+    // Computer & iPad: Strong jumping and drifting effects
+    if (bassNorm > 0.65 && now - lastTargetChange > 250) {
+      // Strong, rapid jump on heavy beats
+      const maxOffset = 180;
+      logoPos.targetX = (Math.random() - 0.5) * maxOffset;
+      logoPos.targetY = (Math.random() - 0.5) * maxOffset;
+      lastTargetChange = now;
+    } else if (now - lastTargetChange > 800) {
+      // Gentle drift offset when quiet
+      const maxOffset = 65;
+      logoPos.targetX = (Math.random() - 0.5) * maxOffset;
+      logoPos.targetY = (Math.random() - 0.5) * maxOffset;
+      lastTargetChange = now;
+    }
   }
   
   if (isOutroPhase2) {
@@ -480,18 +494,29 @@ function animateIntroLogo() {
   logoPos.x += (logoPos.targetX - logoPos.x) * positionLerp;
   logoPos.y += (logoPos.targetY - logoPos.y) * positionLerp;
   
-  // 2. Dynamic global scaling (pulsing up to 1.6x, shrinks to 0 during outro)
-  const targetScale = isOutroPhase2 ? 0 : (1.0 + bassNorm * 0.45 + volNorm * 0.15);
-  logoScale.current += (targetScale - logoScale.current) * (isOutroPhase2 ? 0.05 : 0.16);
+  // 2. Dynamic global scaling (pulsing up to 1.8x on desktop, 1.08x on mobile, shrinks to 0 during outro)
+  let targetScale;
+  if (isOutroPhase2) {
+    targetScale = 0;
+  } else if (isMobilePhone) {
+    // Mobile: very light scale pulse
+    targetScale = 1.0 + bassNorm * 0.08;
+  } else {
+    // Desktop/iPad: strong dynamic scaling
+    targetScale = 1.0 + bassNorm * 0.6 + volNorm * 0.2;
+  }
+  
+  const scaleLerp = isOutroPhase2 ? 0.05 : (isMobilePhone ? 0.12 : 0.18);
+  logoScale.current += (targetScale - logoScale.current) * scaleLerp;
   
   if (logoContainer) {
     logoContainer.style.transform = `translate3d(${logoPos.x}px, ${logoPos.y}px, 0) scale(${logoScale.current})`;
   }
   
   if (logoMain) {
-    // 3. Playful blinking/flickering effect on high bass beats
+    // 3. Playful blinking/flickering effect on high bass beats (disabled on mobile to avoid paint storms)
     let opacity = isOutroPhase2 ? 0 : 1;
-    if (!isOutroPhase2 && bassNorm > 0.6 && Math.random() > 0.35) {
+    if (!isMobilePhone && !isOutroPhase2 && bassNorm > 0.6 && Math.random() > 0.35) {
       opacity = Math.random() > 0.5 ? 0.1 : 0.4 + Math.random() * 0.6; // Rapid neon flash
     }
     
