@@ -365,13 +365,26 @@ body.intro-active {
   -webkit-clip-path: inset(0% 0% 4.9492% 0%);
 }
 
+.robot-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+  clip-path: circle(0px at 50% 50%);
+  -webkit-clip-path: circle(0px at 50% 50%);
+  will-change: clip-path;
+}
+
 .img-robot {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 10;
-  clip-path: circle(0px at 50% 50%);
-  -webkit-clip-path: circle(0px at 50% 50%);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   
   /* Hardcoded positioning offsets to align human and robot face perfectly (Responsive %) */
   transform: translate(0.5319%, 1.3959%) scale(0.901);

@@ -8,6 +8,7 @@ import './style.css';
 const container = document.getElementById('image-viewer-container');
 const imgHuman = document.getElementById('img-human');
 const imgRobot = document.getElementById('img-robot');
+const robotWrapper = document.getElementById('robot-wrapper');
 const scannerRing = document.getElementById('scanner-ring-elem');
 const coordsDisplay = document.getElementById('coords-display');
 const soundToggle = document.getElementById('sound-toggle');
@@ -145,10 +146,10 @@ function animate() {
   current.y += (target.y - current.y) * currentLerp;
   scanRadius.current += (scanRadius.target - scanRadius.current) * currentLerp;
 
-  // Apply clip path to top image (robot) to reveal it
+  // Apply clip path to top image wrapper (robot) to reveal it
   const clipString = `circle(${scanRadius.current}px at ${current.x}px ${current.y}px)`;
-  imgRobot.style.clipPath = clipString;
-  imgRobot.style.webkitClipPath = clipString;
+  robotWrapper.style.clipPath = clipString;
+  robotWrapper.style.webkitClipPath = clipString;
 
   // Positioning the glowing scanner ring overlay using GPU-accelerated translate3d + scale
   if (scanRadius.current > 1) {
@@ -192,8 +193,8 @@ function animate() {
   } else {
     // Reset to complete standby state to save resource consumption
     isLoopRunning = false;
-    imgRobot.style.clipPath = 'circle(0px at 0px 0px)';
-    imgRobot.style.webkitClipPath = 'circle(0px at 0px 0px)';
+    robotWrapper.style.clipPath = 'circle(0px at 0px 0px)';
+    robotWrapper.style.webkitClipPath = 'circle(0px at 0px 0px)';
     scannerRing.style.display = 'none';
     if (coordsDisplay) {
       coordsDisplay.textContent = 'SYS.COORD: STANDBY';

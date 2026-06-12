@@ -131,8 +131,10 @@
                 <!-- Human layer (visible by default) -->
                 <img src="/src/assets/human.png" alt="DJ VANZI Human Form" class="viewer-img img-human" id="img-human" draggable="false" />
                 
-                <!-- Robot layer (revealed around cursor) -->
-                <img src="/src/assets/robot.png" alt="DJ VANZI Cybernetic Form" class="viewer-img img-robot" id="img-robot" draggable="false" />
+                <!-- Robot layer wrapper (receives clip path to prevent dynamic image transform redraws) -->
+                <div class="robot-wrapper" id="robot-wrapper">
+                  <img src="/src/assets/robot.png" alt="DJ VANZI Cybernetic Form" class="viewer-img img-robot" id="img-robot" draggable="false" />
+                </div>
                 
 
                 <!-- Minimalist Transparent Scanner Ring -->
