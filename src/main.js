@@ -202,20 +202,32 @@ animate();
 let audioCtx = null;
 let soundOn = false;
 let introDuration = 9.0; // Fallback duration
+let introAudioBuffer = null;
 
 // Custom audio file tags (loaded dynamically to prevent load delays)
 const introAudio = new Audio('/intro.mp3');
 introAudio.crossOrigin = "anonymous";
 
-// Pre-fetch intro audio in the background
+// Pre-fetch and decode intro audio in the background
 async function prefetchIntroAudio() {
   try {
     const response = await fetch('/intro.mp3');
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    window.introArrayBuffer = await response.arrayBuffer();
-    console.log("Intro audio pre-fetched successfully.");
+    const arrayBuffer = await response.arrayBuffer();
+    
+    // Create a temporary AudioContext for background decoding
+    const tempCtx = new (window.AudioContext || window.webkitAudioContext)();
+    tempCtx.decodeAudioData(arrayBuffer, (decoded) => {
+      introAudioBuffer = decoded;
+      introDuration = decoded.duration;
+      console.log("Intro audio pre-decoded in background. Duration:", introDuration);
+      tempCtx.close();
+    }, (err) => {
+      console.error("Background decodeAudioData failed:", err);
+      tempCtx.close();
+    });
   } catch (err) {
-    console.error("Failed to prefetch intro audio:", err);
+    console.error("Failed to prefetch/decode intro audio:", err);
   }
 }
 prefetchIntroAudio();
@@ -344,37 +356,49 @@ let introSourceNode = null;
 
 async function playIntroAudio(ctx, onComplete) {
   try {
-    let arrayBuffer;
-    if (window.introArrayBuffer) {
-      arrayBuffer = window.introArrayBuffer.slice(0); // slice to clone because decodeAudioData consumes the buffer
+    if (introAudioBuffer) {
+      console.log("Using pre-decoded audio buffer.");
+      introSourceNode = ctx.createBufferSource();
+      introSourceNode.buffer = introAudioBuffer;
+      
+      introAnalyser = ctx.createAnalyser();
+      introAnalyser.fftSize = 64;
+      
+      introSourceNode.connect(introAnalyser);
+      introAnalyser.connect(ctx.destination);
+      
+      introSourceNode.start(0);
+      
+      introSourceNode.onended = () => {
+        onComplete();
+      };
+      
+      introTimeout = setTimeout(onComplete, (introDuration + 0.2) * 1000);
     } else {
-      console.log("Audio buffer not pre-fetched yet. Fetching now...");
+      console.log("Audio buffer not pre-decoded yet. Fetching and decoding dynamically...");
       const response = await fetch('/intro.mp3');
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      arrayBuffer = await response.arrayBuffer();
+      const arrayBuffer = await response.arrayBuffer();
+      
+      const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+      introDuration = audioBuffer.duration;
+      
+      introSourceNode = ctx.createBufferSource();
+      introSourceNode.buffer = audioBuffer;
+      
+      introAnalyser = ctx.createAnalyser();
+      introAnalyser.fftSize = 64;
+      
+      introSourceNode.connect(introAnalyser);
+      introAnalyser.connect(ctx.destination);
+      
+      introSourceNode.start(0);
+      introSourceNode.onended = () => {
+        onComplete();
+      };
+      
+      introTimeout = setTimeout(onComplete, (introDuration + 0.2) * 1000);
     }
-    
-    const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
-    introDuration = audioBuffer.duration;
-    console.log("Decoded audio duration:", introDuration);
-    
-    introSourceNode = ctx.createBufferSource();
-    introSourceNode.buffer = audioBuffer;
-    
-    introAnalyser = ctx.createAnalyser();
-    introAnalyser.fftSize = 64;
-    
-    introSourceNode.connect(introAnalyser);
-    introAnalyser.connect(ctx.destination);
-    
-    introSourceNode.start(0);
-    
-    introSourceNode.onended = () => {
-      onComplete();
-    };
-    
-    introTimeout = setTimeout(onComplete, (introDuration + 0.2) * 1000);
-    
   } catch (err) {
     console.warn("Web Audio playback failed, falling back to HTML5 Audio:", err);
     playIntroAudioFallback(onComplete);
@@ -567,35 +591,46 @@ function enterExperience() {
   }, 1200);
 }
 
+let introPlaying = false;
+
 // Click or Touch to initiate system and play intro audio (with proper AudioContext unlocking for iOS Safari)
 const handleInitiate = async () => {
-  if (audioCtx) return; // Prevent double-triggering
-  
-  // Setup and resume audio context to unlock Web Audio on iOS Safari
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  
-  // Set audio session category to playback to override the hardware mute switch on iOS
-  if (navigator.audioSession) {
-    try {
-      navigator.audioSession.type = 'playback';
-    } catch (e) {
-      console.warn("Could not set audio session category:", e);
-    }
+  // Hide the initiation button container completely immediately to give instant feedback
+  if (introEntry) {
+    introEntry.style.display = 'none';
   }
   
-  if (audioCtx.state === 'suspended') {
-    await audioCtx.resume();
-  }
+  if (introPlaying) return; // Prevent double-triggering
+  introPlaying = true;
   
-  // Hide the initiation button container completely immediately
-  introEntry.style.display = 'none';
-  
-  // Track start time
+  // Track start time and start animation loop immediately
   startTime = Date.now();
-  
-  // Play intro audio and start beat animation loop
-  playIntroAudio(audioCtx, enterExperience);
   animateIntroLogo();
+  
+  try {
+    // Setup and resume audio context to unlock Web Audio on iOS Safari
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Set audio session category to playback to override the hardware mute switch on iOS
+    if (navigator.audioSession) {
+      try {
+        navigator.audioSession.type = 'playback';
+      } catch (e) {
+        console.warn("Could not set audio session category:", e);
+      }
+    }
+    
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume(); // Start resuming in background without blocking
+    }
+    
+    // Play intro audio
+    playIntroAudio(audioCtx, enterExperience);
+  } catch (err) {
+    console.error("Audio initialization failed, entering experience directly in 9s:", err);
+    // If audio initialization crashes, set a fail-safe timeout to guarantee page entry
+    setTimeout(enterExperience, 9000);
+  }
 };
 
 btnInitiate.addEventListener('click', handleInitiate);
