@@ -43,9 +43,8 @@ html, body {
   width: 100%;
   min-height: 100%;
   
-  /* UNIFIED SCREEN BACKDROP: Beautiful linear gradient rising from a vibrant soft teal-blue to a rich dark teal */
-  background: linear-gradient(to top, #9ecbd4 0%, #83bcc6 8%, #5eaec0 28%, #206f7f 60%, #114c57 100%) no-repeat;
-  background-attachment: fixed;
+  /* Fallback solid background color matching the top of the page */
+  background: #114c57;
   
   color: var(--color-text-primary);
   font-family: var(--font-sans);
@@ -93,6 +92,9 @@ body.intro-active {
   justify-content: space-between;
   position: relative;
   overflow: hidden; /* Prevent background 3D text from causing global horizontal scrollbar on mobile viewports */
+  
+  /* Beautiful linear gradient rising from a vibrant soft teal-blue at bottom to a rich dark teal at top */
+  background: linear-gradient(to top, #9ecbd4 0%, #83bcc6 8%, #5eaec0 28%, #206f7f 60%, #114c57 100%) no-repeat;
 }
 
 .second-page {
