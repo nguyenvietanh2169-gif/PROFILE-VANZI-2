@@ -278,25 +278,33 @@ function startAudio() {
   }
   
   soundOn = true;
-  soundToggle.classList.add('playing');
-  soundToggle.querySelector('.sound-text').textContent = 'AUDIO: ON';
+  if (soundToggle) {
+    soundToggle.classList.add('playing');
+    const textNode = soundToggle.querySelector('.sound-text');
+    if (textNode) textNode.textContent = 'AUDIO: ON';
+  }
 }
 
 function stopAudio() {
   soundOn = false;
-  soundToggle.classList.remove('playing');
-  soundToggle.querySelector('.sound-text').textContent = 'AUDIO: OFF';
+  if (soundToggle) {
+    soundToggle.classList.remove('playing');
+    const textNode = soundToggle.querySelector('.sound-text');
+    if (textNode) textNode.textContent = 'AUDIO: OFF';
+  }
 }
 
 // Click Trigger for sound toggle
-soundToggle.addEventListener('click', () => {
-  if (soundOn) {
-    stopAudio();
-  } else {
-    startAudio();
-    playBeep(600, 0.1); // UI toggle beep
-  }
-});
+if (soundToggle) {
+  soundToggle.addEventListener('click', () => {
+    if (soundOn) {
+      stopAudio();
+    } else {
+      startAudio();
+      playBeep(600, 0.1); // UI toggle beep
+    }
+  });
+}
 
 // UI Sound Synthesis helper (clicks & enter scan beeps)
 function playBeep(frequency, duration) {
