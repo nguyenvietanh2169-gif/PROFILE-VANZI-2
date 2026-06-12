@@ -431,29 +431,10 @@ let lastTargetChange = 0;
 let startTime = 0;
 
 // Draw and animate the logo + clones according to the music frequencies
+// Draw and animate the logo + clones according to the music frequencies
 function animateIntroLogo() {
   if (!isIntroActive) return;
   introAnimationId = requestAnimationFrame(animateIntroLogo);
-  
-  if (!introAnalyser) return;
-  
-  const bufferLength = introAnalyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
-  introAnalyser.getByteFrequencyData(dataArray);
-  
-  // Calculate average volume
-  let sum = 0;
-  for (let i = 0; i < bufferLength; i++) {
-    sum += dataArray[i];
-  }
-  const avgVolume = sum / bufferLength; // 0 to 255
-  
-  // Bass frequencies (first 4 bins)
-  const bass = (dataArray[0] + dataArray[1] + dataArray[2] + dataArray[3]) / 4;
-  
-  // Normalize parameters
-  const bassNorm = bass / 255;
-  const volNorm = avgVolume / 255;
   
   const logoContainer = document.querySelector('.intro-logo-container');
   const logoMain = document.querySelector('.logo-main');
@@ -464,7 +445,7 @@ function animateIntroLogo() {
   // Get actual music duration
   const duration = introDuration;
   
-  // Use elapsed timer as progress time (most accurate and consistent for Web Audio source node)
+  // Use elapsed timer as progress time
   const progressTime = elapsed;
   
   // Define transition phases near the end of the song
@@ -472,7 +453,10 @@ function animateIntroLogo() {
   const isOutroPhase2 = progressTime >= (duration - 3.9); // Slide slices & Fade logo (last 3.9s)
   
   const isMobilePhone = window.innerWidth <= 600;
-
+  
+  let bassNorm = 0;
+  let volNorm = 0;
+  
   if (isOutroPhase1) {
     if (!introGate.classList.contains('draw-lines')) {
       introGate.classList.add('draw-lines');
@@ -484,13 +468,29 @@ function animateIntroLogo() {
   } else if (isMobilePhone) {
     // Mobile Phone: gentle wiggling with slow update frequency to save CPU
     if (now - lastTargetChange > 300) {
-      const wiggleAmt = bassNorm > 0.6 ? 4 : 1;
-      logoPos.targetX = (Math.random() - 0.5) * wiggleAmt;
-      logoPos.targetY = (Math.random() - 0.5) * wiggleAmt;
+      // Simulate beat intensity based on sin waves
+      const beatIntensity = Math.sin(progressTime * 2.5 * Math.PI) > 0.4 ? 4 : 1;
+      logoPos.targetX = (Math.random() - 0.5) * beatIntensity;
+      logoPos.targetY = (Math.random() - 0.5) * beatIntensity;
       lastTargetChange = now;
     }
-  } else {
-    // Computer & iPad: Strong, rapid jumping and shaking effects
+  } else if (introAnalyser) {
+    // Computer & iPad: Use actual audio frequency analyzer data
+    const bufferLength = introAnalyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    introAnalyser.getByteFrequencyData(dataArray);
+    
+    // Calculate average volume
+    let sum = 0;
+    for (let i = 0; i < bufferLength; i++) {
+      sum += dataArray[i];
+    }
+    const avgVolume = sum / bufferLength; // 0 to 255
+    const bass = (dataArray[0] + dataArray[1] + dataArray[2] + dataArray[3]) / 4;
+    
+    bassNorm = bass / 255;
+    volNorm = avgVolume / 255;
+    
     if (bassNorm > 0.6 && now - lastTargetChange > 90) {
       // Fast, strong jumps on heavy beats
       const maxOffset = 200;
@@ -530,8 +530,9 @@ function animateIntroLogo() {
   if (isOutroPhase2) {
     targetScale = 0;
   } else if (isMobilePhone) {
-    // Mobile: very light scale pulse
-    targetScale = 1.0 + bassNorm * 0.08;
+    // Mobile: simulate a light scale pulse based on time-based beat rhythm
+    const timeBeat = Math.sin(progressTime * 2.5 * Math.PI) > 0.6 ? 0.06 : 0;
+    targetScale = 1.0 + timeBeat;
   } else {
     // Desktop/iPad: strong dynamic scaling
     targetScale = 1.0 + bassNorm * 0.6 + volNorm * 0.2;
@@ -607,29 +608,37 @@ const handleInitiate = async () => {
   startTime = Date.now();
   animateIntroLogo();
   
-  try {
-    // Setup and resume audio context to unlock Web Audio on iOS Safari
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
-    // Set audio session category to playback to override the hardware mute switch on iOS
-    if (navigator.audioSession) {
-      try {
-        navigator.audioSession.type = 'playback';
-      } catch (e) {
-        console.warn("Could not set audio session category:", e);
+  const isMobilePhone = window.innerWidth <= 600;
+  
+  if (isMobilePhone) {
+    // Mobile Phone: play standard HTML5 Audio directly (synchronously inside the click handler to satisfy iOS requirements)
+    console.log("Mobile phone detected. Playing via standard HTML5 Audio to avoid Web Audio API bugs.");
+    playIntroAudioFallback(enterExperience);
+  } else {
+    // Computer & iPad: Play via Web Audio API for beat-reactive visualizer
+    try {
+      // Setup and resume audio context to unlock Web Audio on iOS Safari
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      
+      // Set audio session category to playback to override the hardware mute switch on iOS
+      if (navigator.audioSession) {
+        try {
+          navigator.audioSession.type = 'playback';
+        } catch (e) {
+          console.warn("Could not set audio session category:", e);
+        }
       }
+      
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume(); // Start resuming in background without blocking
+      }
+      
+      // Play intro audio
+      playIntroAudio(audioCtx, enterExperience);
+    } catch (err) {
+      console.error("Audio initialization failed, falling back to HTML5 audio:", err);
+      playIntroAudioFallback(enterExperience);
     }
-    
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume(); // Start resuming in background without blocking
-    }
-    
-    // Play intro audio
-    playIntroAudio(audioCtx, enterExperience);
-  } catch (err) {
-    console.error("Audio initialization failed, entering experience directly in 9s:", err);
-    // If audio initialization crashes, set a fail-safe timeout to guarantee page entry
-    setTimeout(enterExperience, 9000);
   }
 };
 
