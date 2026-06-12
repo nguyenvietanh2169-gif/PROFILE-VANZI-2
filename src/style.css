@@ -370,6 +370,8 @@ body.intro-active {
   /* Hardcoded alignment crop to match robot image shoulder height (Responsive %) */
   clip-path: inset(0% 0% 4.9492% 0%);
   -webkit-clip-path: inset(0% 0% 4.9492% 0%);
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
 }
 
 .robot-wrapper {
@@ -382,7 +384,8 @@ body.intro-active {
   pointer-events: none;
   clip-path: circle(0px at 50% 50%);
   -webkit-clip-path: circle(0px at 50% 50%);
-  will-change: clip-path;
+  transform: translate3d(0, 0, 0);
+  will-change: clip-path, transform;
 }
 
 .img-robot {
@@ -394,7 +397,8 @@ body.intro-active {
   object-fit: cover;
   
   /* Hardcoded positioning offsets to align human and robot face perfectly (Responsive %) */
-  transform: translate(0.5319%, 1.3959%) scale(0.901);
+  transform: translate3d(0.5319%, 1.3959%, 0) scale(0.901);
+  will-change: transform;
 }
 
 .particle-overlay {
@@ -1050,5 +1054,10 @@ body.intro-active {
     transform: none !important;
     background: transparent !important;
     border: none !important;
+  }
+
+  /* Disable heavy SVG filter and outline drop-shadows on mobile to maximize render speed during dynamic clipping */
+  .viewer-img {
+    filter: contrast(1.03) !important;
   }
 }

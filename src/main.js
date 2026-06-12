@@ -56,11 +56,26 @@ imgHuman.style.webkitClipPath = `inset(0% 0% ${cropBottomPercent}% 0%)`;
 
 
 
-// 4. Mouse and Touch Event Listeners
+// 4. Mouse and Touch Event Listeners - Cached container bounding rect to eliminate layout thrashing
+let containerRect = null;
+function updateContainerRect() {
+  if (container) {
+    containerRect = container.getBoundingClientRect();
+  }
+}
+// Initial rect calculation
+updateContainerRect();
+
+// Update on layout adjustments
+window.addEventListener('resize', updateContainerRect);
+window.addEventListener('scroll', updateContainerRect, { passive: true });
+
 function updateCoordinates(clientX, clientY) {
-  const rect = container.getBoundingClientRect();
-  target.x = clientX - rect.left;
-  target.y = clientY - rect.top;
+  if (!containerRect) {
+    updateContainerRect();
+  }
+  target.x = clientX - containerRect.left;
+  target.y = clientY - containerRect.top;
 }
 
 container.addEventListener('mousemove', (e) => {
@@ -79,6 +94,7 @@ container.addEventListener('mousemove', (e) => {
 
 container.addEventListener('mouseenter', (e) => {
   isHovering = true;
+  updateContainerRect(); // Refresh rect on start of interaction
   scanRadius.target = maxScanRadius;
   updateCoordinates(e.clientX, e.clientY);
   // Set current to target immediately on enter to prevent lag from center
@@ -119,6 +135,7 @@ container.addEventListener('touchstart', (e) => {
     e.preventDefault();
     
     isHovering = true;
+    updateContainerRect(); // Refresh rect on start of interaction
     scanRadius.target = maxScanRadius;
     updateCoordinates(e.touches[0].clientX, e.touches[0].clientY);
     current.x = target.x;
@@ -139,12 +156,16 @@ container.addEventListener('touchend', () => {
 
 function animate() {
   const isMobilePhone = window.innerWidth <= 600;
-  const currentLerp = isMobilePhone ? 0.22 : lerpFactor;
+  
+  // On mobile, coordinates track the finger directly (LERP = 1.0) to remove input delay completely.
+  // Radius animation (opening/closing the circle) still transitions smoothly at LERP = 0.22.
+  const currentLerp = isMobilePhone ? 1.0 : lerpFactor;
+  const radiusLerp = isMobilePhone ? 0.22 : lerpFactor;
 
   // Linear Interpolation (LERP) formula: current += (target - current) * factor
   current.x += (target.x - current.x) * currentLerp;
   current.y += (target.y - current.y) * currentLerp;
-  scanRadius.current += (scanRadius.target - scanRadius.current) * currentLerp;
+  scanRadius.current += (scanRadius.target - scanRadius.current) * radiusLerp;
 
   // Apply clip path to top image wrapper (robot) to reveal it
   const clipString = `circle(${scanRadius.current}px at ${current.x}px ${current.y}px)`;
@@ -175,9 +196,11 @@ function animate() {
 
   // Tilt visual card slightly towards cursor (disabled on mobile to avoid massive GPU composition bottlenecks)
   if (!isMobilePhone && isHovering) {
-    const rect = container.getBoundingClientRect();
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
+    if (!containerRect) {
+      updateContainerRect();
+    }
+    const centerX = containerRect.width / 2;
+    const centerY = containerRect.height / 2;
     const tiltX = (target.y - centerY) / centerY * 6; // Max 6 deg tilt
     const tiltY = (target.x - centerX) / centerX * -6;
     container.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
