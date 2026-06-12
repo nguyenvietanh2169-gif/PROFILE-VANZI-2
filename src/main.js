@@ -1347,8 +1347,8 @@ function initGallery() {
   const grid = document.getElementById('gallery-grid-container');
   if (!grid) return;
 
-  // Filter out Kaizen Club image from the grid to avoid duplication
-  const gridImages = GALLERY_IMAGES.filter(img => !img.src.includes('kaizen-club.jpg'));
+  // Filter out club-stage.jpg from the grid to avoid duplication
+  const gridImages = GALLERY_IMAGES.filter(img => !img.src.includes('club-stage.jpg'));
 
   grid.innerHTML = gridImages.map((img) => {
     // Find original index in GALLERY_IMAGES array
