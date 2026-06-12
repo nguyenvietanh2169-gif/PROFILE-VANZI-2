@@ -27,6 +27,7 @@
 
   /* Neumorphic Page 2 Background */
   --color-bg-page2: #cbe2e7; /* Soft light blue-grey-teal matching page 1 bottom but lighter */
+  --color-bg-page3: #abccd3; /* Richer, darker blue-teal */
 }
 
 * {
@@ -1076,7 +1077,10 @@ body.intro-active {
    8. Neumorphic Music Player Section
    ========================================================================== */
 .second-page {
-  background-color: var(--color-bg-page2) !important; /* Soft light blue-grey-teal matching page 1 but lighter */
+  --color-bg-page: var(--color-bg-page2);
+  --neu-shadow-dark: rgba(155, 178, 184, 0.85);
+  --neu-shadow-light: rgba(255, 255, 255, 0.95);
+  background-color: var(--color-bg-page) !important; /* Soft light blue-grey-teal matching page 1 but lighter */
   color: #1b353a !important;
   display: flex;
   flex-direction: column;
@@ -1086,6 +1090,7 @@ body.intro-active {
   border-top: 1px solid rgba(255, 255, 255, 0.4);
   position: relative;
   overflow: hidden;
+  z-index: 2;
 }
 
 .neumorphic-player-container {
@@ -1101,24 +1106,24 @@ body.intro-active {
 
 /* Common Neumorphic Utilities */
 .neu-flat {
-  background: var(--color-bg-page2);
+  background: var(--color-bg-page, var(--color-bg-page2));
   border-radius: 24px;
-  box-shadow: 9px 9px 18px rgba(155, 178, 184, 0.85), -9px -9px 18px rgba(255, 255, 255, 0.95);
+  box-shadow: 9px 9px 18px var(--neu-shadow-dark, rgba(155, 178, 184, 0.85)), -9px -9px 18px var(--neu-shadow-light, rgba(255, 255, 255, 0.95));
   padding: 2.5rem;
   transition: transform var(--transition-normal);
 }
 
 .neu-recessed-flat {
-  background: var(--color-bg-page2);
+  background: var(--color-bg-page, var(--color-bg-page2));
   border-radius: 18px;
-  box-shadow: inset 4px 4px 8px rgba(155, 178, 184, 0.85), inset -4px -4px 8px rgba(255, 255, 255, 0.95);
+  box-shadow: inset 4px 4px 8px var(--neu-shadow-dark, rgba(155, 178, 184, 0.85)), inset -4px -4px 8px var(--neu-shadow-light, rgba(255, 255, 255, 0.95));
   padding: 1.2rem;
 }
 
 .neu-flat-vertical {
-  background: var(--color-bg-page2);
+  background: var(--color-bg-page, var(--color-bg-page2));
   border-radius: 40px;
-  box-shadow: 5px 5px 12px rgba(155, 178, 184, 0.85), -5px -5px 12px rgba(255, 255, 255, 0.95);
+  box-shadow: 5px 5px 12px var(--neu-shadow-dark, rgba(155, 178, 184, 0.85)), -5px -5px 12px var(--neu-shadow-light, rgba(255, 255, 255, 0.95));
   padding: 1rem 0.6rem;
   display: flex;
   flex-direction: column;
@@ -1131,13 +1136,13 @@ body.intro-active {
   height: 44px;
   border-radius: 50%;
   border: none;
-  background: var(--color-bg-page2);
+  background: var(--color-bg-page, var(--color-bg-page2));
   color: #4a666c;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 4px 4px 9px rgba(155, 178, 184, 0.85), -4px -4px 9px rgba(255, 255, 255, 0.95);
+  box-shadow: 4px 4px 9px var(--neu-shadow-dark, rgba(155, 178, 184, 0.85)), -4px -4px 9px var(--neu-shadow-light, rgba(255, 255, 255, 0.95));
   transition: all 0.2s ease;
   outline: none;
 }
@@ -1149,14 +1154,14 @@ body.intro-active {
 
 .neu-btn-circle:active,
 .neu-btn-circle.active {
-  box-shadow: inset 3px 3px 6px rgba(155, 178, 184, 0.85), inset -3px -3px 6px rgba(255, 255, 255, 0.95);
+  box-shadow: inset 3px 3px 6px var(--neu-shadow-dark, rgba(155, 178, 184, 0.85)), inset -3px -3px 6px var(--neu-shadow-light, rgba(255, 255, 255, 0.95));
   color: #164f5c;
   transform: none;
 }
 
 .neu-btn-circle.liked {
   color: #ff3b30 !important;
-  box-shadow: inset 2px 2px 5px rgba(255, 59, 48, 0.2), inset -2px -2px 5px rgba(255, 255, 255, 0.9), 3px 3px 6px rgba(155, 178, 184, 0.85);
+  box-shadow: inset 2px 2px 5px rgba(255, 59, 48, 0.2), inset -2px -2px 5px rgba(255, 255, 255, 0.9), 3px 3px 6px var(--neu-shadow-dark, rgba(155, 178, 184, 0.85));
 }
 
 .neu-btn-circle-active {
@@ -1164,13 +1169,13 @@ body.intro-active {
   height: 50px;
   border-radius: 50%;
   border: none;
-  background: var(--color-bg-page2);
+  background: var(--color-bg-page, var(--color-bg-page2));
   color: #164f5c;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 4px 4px 9px rgba(155, 178, 184, 0.85), -4px -4px 9px rgba(255, 255, 255, 0.95);
+  box-shadow: 4px 4px 9px var(--neu-shadow-dark, rgba(155, 178, 184, 0.85)), -4px -4px 9px var(--neu-shadow-light, rgba(255, 255, 255, 0.95));
   transition: all 0.2s ease;
   outline: none;
 }
@@ -1181,14 +1186,14 @@ body.intro-active {
 
 .neu-btn-circle-active:active,
 .neu-btn-circle-active.playing {
-  box-shadow: inset 3px 3px 6px rgba(155, 178, 184, 0.85), inset -3px -3px 6px rgba(255, 255, 255, 0.95);
+  box-shadow: inset 3px 3px 6px var(--neu-shadow-dark, rgba(155, 178, 184, 0.85)), inset -3px -3px 6px var(--neu-shadow-light, rgba(255, 255, 255, 0.95));
   transform: none;
 }
 
 .neu-recessed-circle {
-  background: var(--color-bg-page2);
+  background: var(--color-bg-page, var(--color-bg-page2));
   border-radius: 50%;
-  box-shadow: inset 8px 8px 16px rgba(155, 178, 184, 0.85), inset -8px -8px 16px rgba(255, 255, 255, 0.95);
+  box-shadow: inset 8px 8px 16px var(--neu-shadow-dark, rgba(155, 178, 184, 0.85)), inset -8px -8px 16px var(--neu-shadow-light, rgba(255, 255, 255, 0.95));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1330,8 +1335,8 @@ body.intro-active {
   width: 100%;
   height: 6px;
   border-radius: 3px;
-  background: var(--color-bg-page2);
-  box-shadow: inset 2px 2px 4px rgba(155, 178, 184, 0.85), inset -2px -2px 4px rgba(255, 255, 255, 0.95);
+  background: var(--color-bg-page, var(--color-bg-page2));
+  box-shadow: inset 2px 2px 4px var(--neu-shadow-dark, rgba(155, 178, 184, 0.85)), inset -2px -2px 4px var(--neu-shadow-light, rgba(255, 255, 255, 0.95));
   position: relative;
   overflow: hidden;
 }
@@ -1391,11 +1396,11 @@ body.intro-active {
 .neu-badge {
   font-size: 0.7rem;
   font-weight: 600;
-  background: var(--color-bg-page2);
+  background: var(--color-bg-page, var(--color-bg-page2));
   padding: 4px 10px;
   border-radius: 12px;
   color: #1b353a;
-  box-shadow: inset 2px 2px 4px rgba(155, 178, 184, 0.85), inset -2px -2px 4px rgba(255, 255, 255, 0.95);
+  box-shadow: inset 2px 2px 4px var(--neu-shadow-dark, rgba(155, 178, 184, 0.85)), inset -2px -2px 4px var(--neu-shadow-light, rgba(255, 255, 255, 0.95));
 }
 
 /* Top Tracks Avatars */
@@ -1425,7 +1430,7 @@ body.intro-active {
 }
 
 .top-tracks-avatars .avatar-item.active {
-  box-shadow: inset 2px 2px 4px rgba(155, 178, 184, 0.85), inset -2px -2px 4px rgba(255, 255, 255, 0.95);
+  box-shadow: inset 2px 2px 4px var(--neu-shadow-dark, rgba(155, 178, 184, 0.85)), inset -2px -2px 4px var(--neu-shadow-light, rgba(255, 255, 255, 0.95));
 }
 
 /* Popular Playlists */
@@ -1436,7 +1441,7 @@ body.intro-active {
 }
 
 .playlist-card {
-  background: var(--color-bg-page2);
+  background: var(--color-bg-page, var(--color-bg-page2));
   padding: 1rem;
   border-radius: 20px;
   cursor: pointer;
@@ -1444,17 +1449,17 @@ body.intro-active {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  box-shadow: 4px 4px 9px rgba(155, 178, 184, 0.85), -4px -4px 9px rgba(255, 255, 255, 0.95);
+  box-shadow: 4px 4px 9px var(--neu-shadow-dark, rgba(155, 178, 184, 0.85)), -4px -4px 9px var(--neu-shadow-light, rgba(255, 255, 255, 0.95));
   transition: all 0.2s ease;
 }
 
 .playlist-card:hover {
   transform: translateY(-2px);
-  box-shadow: 5px 5px 12px rgba(155, 178, 184, 0.85), -5px -5px 12px rgba(255, 255, 255, 0.95);
+  box-shadow: 5px 5px 12px var(--neu-shadow-dark, rgba(155, 178, 184, 0.85)), -5px -5px 12px var(--neu-shadow-light, rgba(255, 255, 255, 0.95));
 }
 
 .playlist-card.active {
-  box-shadow: inset 4px 4px 8px rgba(155, 178, 184, 0.85), inset -4px -4px 8px rgba(255, 255, 255, 0.95);
+  box-shadow: inset 4px 4px 8px var(--neu-shadow-dark, rgba(155, 178, 184, 0.85)), inset -4px -4px 8px var(--neu-shadow-light, rgba(255, 255, 255, 0.95));
   transform: none;
 }
 
@@ -1463,7 +1468,7 @@ body.intro-active {
   aspect-ratio: 16 / 9;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 2px 3px 6px rgba(155, 178, 184, 0.8);
+  box-shadow: 2px 3px 6px var(--neu-shadow-dark, rgba(155, 178, 184, 0.8));
 }
 
 .playlist-img img {
@@ -1528,7 +1533,7 @@ body.intro-active {
 
 .song-row.active {
   background: rgba(255, 255, 255, 0.5);
-  box-shadow: inset 2px 2px 4px rgba(155, 178, 184, 0.8);
+  box-shadow: inset 2px 2px 4px var(--neu-shadow-dark, rgba(155, 178, 184, 0.8));
 }
 
 .song-row-left {
@@ -1553,7 +1558,7 @@ body.intro-active {
   border-radius: 6px;
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 1px 2px 4px rgba(155, 178, 184, 0.6);
+  box-shadow: 1px 2px 4px var(--neu-shadow-dark, rgba(155, 178, 184, 0.6));
 }
 
 .song-thumbnail img {
@@ -1665,7 +1670,10 @@ body.intro-active {
    9. Neumorphic About / Biography Section
    ========================================================================== */
 .third-page {
-  background-color: var(--color-bg-page2) !important;
+  --color-bg-page: var(--color-bg-page3);
+  --neu-shadow-dark: rgba(122, 149, 155, 0.85);
+  --neu-shadow-light: rgba(255, 255, 255, 0.85);
+  background-color: var(--color-bg-page) !important;
   color: #1b353a !important;
   display: flex;
   flex-direction: column;
@@ -1675,6 +1683,7 @@ body.intro-active {
   border-top: 1px solid rgba(255, 255, 255, 0.4);
   position: relative;
   overflow: hidden;
+  z-index: 2;
 }
 
 .neumorphic-about-container {
@@ -1792,24 +1801,27 @@ body.intro-active {
 
 .genre-btn {
   font-family: var(--font-sans);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  padding: 8px 16px;
+  padding: 6px 14px;
   border-radius: 20px;
-  border: none;
+  background: rgba(27, 53, 58, 0.05);
+  color: #1b353a;
+  border: 1px solid rgba(27, 53, 58, 0.12);
   cursor: pointer;
   outline: none;
   transition: all 0.2s ease;
 }
 
-.genre-btn.neu-btn-circle {
-  width: auto;
-  height: auto;
+.genre-btn:hover {
+  background: rgba(27, 53, 58, 0.1);
+  border-color: rgba(27, 53, 58, 0.2);
 }
 
-.genre-btn.neu-btn-circle-active {
-  width: auto;
-  height: auto;
+.genre-btn.active {
+  background: #1b353a;
+  color: #ffffff;
+  border-color: #1b353a;
 }
 
 .genre-desc-box {
@@ -1860,4 +1872,442 @@ body.intro-active {
     gap: 0.8rem;
   }
 }
+
+/* ==========================================================================
+   10. Ambient Glow & Scroll Reveal Animations
+   ========================================================================== */
+
+/* Ambient Glow Blobs */
+.ambient-glow {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(140px);
+  opacity: 0.28;
+  transition: all 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1;
+  will-change: top, left, transform, background-color;
+}
+
+.glow-1 {
+  width: 600px;
+  height: 600px;
+  top: -100px;
+  right: -100px;
+  background-color: #114c57;
+}
+
+.glow-2 {
+  width: 500px;
+  height: 500px;
+  bottom: -50px;
+  left: -50px;
+  background-color: #5eaec0;
+}
+
+/* Scroll active body triggers for glow positions & colors */
+body.active-scanner .glow-1 {
+  top: -100px;
+  right: -100px;
+  transform: translate(0, 0) scale(1);
+  background-color: #114c57;
+}
+body.active-scanner .glow-2 {
+  bottom: -50px;
+  left: -50px;
+  transform: translate(0, 0) scale(1);
+  background-color: #5eaec0;
+}
+
+body.active-releases .glow-1 {
+  top: 20%;
+  left: -150px;
+  right: auto;
+  transform: translate(0, 0) scale(1.25);
+  background-color: #83bcc6;
+}
+body.active-releases .glow-2 {
+  bottom: 20%;
+  right: -100px;
+  left: auto;
+  transform: translate(0, 0) scale(1.1);
+  background-color: #cbe2e7;
+}
+
+body.active-about .glow-1 {
+  top: 45%;
+  right: -150px;
+  left: auto;
+  transform: translate(0, 0) scale(1.2);
+  background-color: #79959c;
+}
+body.active-about .glow-2 {
+  bottom: 10%;
+  left: 15%;
+  right: auto;
+  transform: translate(0, 0) scale(1.3);
+  background-color: #1b353a;
+}
+
+/* Glassmorphism overlays on Desktop viewports for ambient glowing look */
+@media (min-width: 1025px) {
+  .second-page {
+    background-color: rgba(203, 226, 231, 0.82) !important;
+    backdrop-filter: blur(35px);
+    -webkit-backdrop-filter: blur(35px);
+  }
+  .third-page {
+    background-color: rgba(171, 204, 211, 0.82) !important;
+    backdrop-filter: blur(35px);
+    -webkit-backdrop-filter: blur(35px);
+  }
+}
+
+/* Scroll Reveal Entrance Animations */
+.reveal-element {
+  opacity: 0;
+  transform: translateY(45px) rotateX(6deg) scale(0.97);
+  transform-origin: top center;
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), 
+              opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.reveal-element.visible {
+  opacity: 1;
+  transform: translateY(0) rotateX(0) scale(1);
+}
+
+.reveal-element.delay-1 {
+  transition-delay: 0.1s;
+}
+
+.reveal-element.delay-2 {
+  transition-delay: 0.25s;
+}
+
+@media (max-width: 768px) {
+  .reveal-element {
+    transform: translateY(25px) scale(0.99); /* Disable 3D tilt, reduce translation to avoid layout lag on mobile */
+  }
+}
+
+/* ==========================================================================
+   11. Neumorphic Media Gallery & Lightbox Section
+   ========================================================================== */
+.fourth-page {
+  --color-bg-page: var(--color-bg-page4, #8cb6bf);
+  --neu-shadow-dark: rgba(100, 128, 134, 0.85);
+  --neu-shadow-light: rgba(255, 255, 255, 0.85);
+  background-color: var(--color-bg-page) !important;
+  color: #1b353a !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  position: relative;
+  overflow: hidden;
+  z-index: 2;
+}
+
+@media (min-width: 1025px) {
+  .fourth-page {
+    background-color: rgba(140, 182, 191, 0.82) !important;
+    backdrop-filter: blur(35px);
+    -webkit-backdrop-filter: blur(35px);
+  }
+}
+
+.neumorphic-gallery-container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  z-index: 10;
+}
+
+.gallery-grid {
+  columns: 3;
+  column-gap: 1.5rem;
+  width: 100%;
+  margin-top: 2rem;
+}
+
+@media (max-width: 900px) {
+  .gallery-grid {
+    columns: 2;
+  }
+}
+@media (max-width: 500px) {
+  .gallery-grid {
+    columns: 1;
+    column-gap: 0;
+  }
+}
+
+.gallery-item {
+  break-inside: avoid;
+  position: relative;
+  background: var(--color-bg-page);
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 4px 4px 9px var(--neu-shadow-dark), -4px -4px 9px var(--neu-shadow-light);
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  display: block;
+}
+
+.gallery-item:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 8px 8px 16px var(--neu-shadow-dark), -8px -8px 16px var(--neu-shadow-light);
+}
+
+.gallery-img-wrapper {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: inset 2px 2px 5px var(--neu-shadow-dark), inset -2px -2px 5px var(--neu-shadow-light);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.gallery-img-wrapper img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gallery-item:hover .gallery-img-wrapper img {
+  transform: scale(1.04);
+}
+
+.gallery-item-details {
+  margin-top: 0.75rem;
+  text-align: left;
+  padding: 0 4px;
+}
+
+.gallery-item-details h5 {
+  font-family: var(--font-title);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1b353a;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.gallery-item-details p {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #79959c;
+  margin: 2px 0 0 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Lightbox Modal Styles */
+.lightbox-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 76, 87, 0.45);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lightbox-close-btn {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10010;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lightbox-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.lightbox-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10010;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lightbox-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.lightbox-nav-btn.prev {
+  left: 2rem;
+}
+
+.lightbox-nav-btn.next {
+  right: 2rem;
+}
+
+.lightbox-content-box {
+  max-width: 800px;
+  width: 100%;
+  background: var(--color-bg-page3);
+  border-radius: 24px;
+  padding: 1.5rem;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.lightbox-img-wrapper {
+  width: 100%;
+  max-height: 60vh;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: inset 4px 4px 10px rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lightbox-img-wrapper img {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  display: block;
+}
+
+.lightbox-details {
+  width: 100%;
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+.lightbox-details h4 {
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1b353a;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lightbox-details p {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4a666c;
+  margin: 4px 0 0 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.lightbox-counter-label {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Scroll active body triggers for glow positions & colors for Gallery Page */
+body.active-gallery .glow-1 {
+  top: 30%;
+  left: 20%;
+  transform: translate(0, 0) scale(1.35);
+  background-color: #8cb6bf;
+}
+body.active-gallery .glow-2 {
+  bottom: -50px;
+  right: -50px;
+  left: auto;
+  transform: translate(0, 0) scale(1.2);
+  background-color: #114c57;
+}
+
+@media (max-width: 768px) {
+  .lightbox-nav-btn {
+    width: 44px;
+    height: 44px;
+  }
+  .lightbox-nav-btn.prev {
+    left: 1rem;
+  }
+  .lightbox-nav-btn.next {
+    right: 1rem;
+  }
+  .lightbox-close-btn {
+    top: 1rem;
+    right: 1rem;
+  }
+  .lightbox-content-box {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+  .fourth-page {
+    padding: 2.5rem 1rem;
+  }
+}
+
+
 

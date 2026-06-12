@@ -61,6 +61,10 @@
         </div>
       </div>
 
+      <!-- Floating Ambient Aura Blobs -->
+      <div class="ambient-glow glow-1"></div>
+      <div class="ambient-glow glow-2"></div>
+
       <!-- First Page Wrapper (Constrains Header + Portrait to exactly 100vh) -->
       <div class="first-page" id="scanner">
         <!-- Minimal Header -->
@@ -75,6 +79,7 @@
               <a href="#scanner" class="nav-link active">Scanner</a>
               <a href="#releases" class="nav-link">Releases</a>
               <a href="#about" class="nav-link">About</a>
+              <a href="#gallery" class="nav-link">Gallery</a>
             </nav>
           </div>
           
@@ -148,7 +153,7 @@
 
         <div class="neumorphic-player-container">
           <!-- Left Panel: Active Player View -->
-          <div class="player-panel-left">
+          <div class="player-panel-left reveal-element delay-1">
             <div class="track-header">
               <h3 id="player-track-title">ĐI CÙNG EM</h3>
               <p id="player-track-artist">DJ VANZI</p>
@@ -205,7 +210,7 @@
           </div>
 
           <!-- Right Panel: Explorer & Tracklist -->
-          <div class="player-panel-right">
+          <div class="player-panel-right reveal-element delay-2">
             <div class="panel-section-title">
               <h4>Sounds of VANZI</h4>
               <span class="neu-badge">11 Tracks</span>
@@ -254,7 +259,7 @@
       <section id="about" class="third-page">
         <div class="neumorphic-about-container">
           <!-- Left Column: Editorial Photo in Neumorphic frame -->
-          <div class="about-photo-wrapper">
+          <div class="about-photo-wrapper reveal-element delay-1">
             <div class="about-photo-inner neu-recessed-flat">
               <img src="/images/hero-portrait.jpg" alt="DJ VANZI Editorial Portrait" class="about-img" />
               <div class="photo-overlay-tag">STUDIO SESSION // 2026</div>
@@ -262,7 +267,7 @@
           </div>
 
           <!-- Right Column: Biography & Details -->
-          <div class="about-content-wrapper">
+          <div class="about-content-wrapper reveal-element delay-2">
             <div class="panel-section-title">
               <span class="neu-badge">The Artist</span>
               <h4>About VANZI</h4>
@@ -290,14 +295,14 @@
             <div class="genres-section">
               <h5>Signature Sounds</h5>
               <div class="genre-buttons" id="genre-buttons-container">
-                <button class="genre-btn neu-btn-circle-active active" data-genre-idx="0">Melodic Techno</button>
-                <button class="genre-btn neu-btn-circle" data-genre-idx="1">Tech House</button>
-                <button class="genre-btn neu-btn-circle" data-genre-idx="2">Progressive House</button>
-                <button class="genre-btn neu-btn-circle" data-genre-idx="3">House</button>
-                <button class="genre-btn neu-btn-circle" data-genre-idx="4">Hard Dance</button>
-                <button class="genre-btn neu-btn-circle" data-genre-idx="5">Psy Trance</button>
-                <button class="genre-btn neu-btn-circle" data-genre-idx="6">Drum & Bass</button>
-                <button class="genre-btn neu-btn-circle" data-genre-idx="7">Hiphop</button>
+                <button class="genre-btn active" data-genre-idx="0">Melodic Techno</button>
+                <button class="genre-btn" data-genre-idx="1">Tech House</button>
+                <button class="genre-btn" data-genre-idx="2">Progressive House</button>
+                <button class="genre-btn" data-genre-idx="3">House</button>
+                <button class="genre-btn" data-genre-idx="4">Hard Dance</button>
+                <button class="genre-btn" data-genre-idx="5">Psy Trance</button>
+                <button class="genre-btn" data-genre-idx="6">Drum & Bass</button>
+                <button class="genre-btn" data-genre-idx="7">Hiphop</button>
               </div>
 
               <!-- Detailed Genre Box -->
@@ -312,6 +317,46 @@
           </div>
         </div>
       </section>
+
+      <!-- Fourth Page Section: Media Gallery -->
+      <section id="gallery" class="fourth-page">
+        <div class="neumorphic-gallery-container">
+          <div class="panel-section-title text-center" style="justify-content: center; flex-direction: column; gap: 0.5rem; margin-bottom: 2rem;">
+            <span class="neu-badge">Visual Journey</span>
+            <h4 style="margin: 0;">Media Gallery</h4>
+          </div>
+          <div class="gallery-grid" id="gallery-grid-container">
+            <!-- Dynamically populated by main.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Lightbox Modal Overlay -->
+      <div id="gallery-lightbox" class="lightbox-modal" style="display: none;">
+        <button id="lightbox-btn-close" class="lightbox-close-btn" aria-label="Close Lightbox">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        
+        <button id="lightbox-btn-prev" class="lightbox-nav-btn prev" aria-label="Previous Image">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        
+        <div class="lightbox-content-box" id="lightbox-box-elem">
+          <div class="lightbox-img-wrapper">
+            <img id="lightbox-main-img" src="" alt="" />
+          </div>
+          <div class="lightbox-details">
+            <h4 id="lightbox-title"></h4>
+            <p id="lightbox-subtitle"></p>
+          </div>
+        </div>
+        
+        <button id="lightbox-btn-next" class="lightbox-nav-btn next" aria-label="Next Image">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+        
+        <div id="lightbox-counter" class="lightbox-counter-label"></div>
+      </div>
     </div>
 
     <!-- Main Module Script -->

@@ -1,5 +1,11 @@
 import './style.css';
 
+// Force scroll to top on load and disable automatic browser scroll restoration to prevent preloader conflicts
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+window.scrollTo(0, 0);
+
 // ==========================================================================
 // DJ VANZI - CORE INTERACTION & PARTICLE ENGINE
 // ==========================================================================
@@ -1146,13 +1152,11 @@ function initGenreSelector() {
     btn.addEventListener('click', () => {
       // Remove active states
       genreButtons.forEach(b => {
-        b.classList.remove('neu-btn-circle-active', 'active');
-        b.classList.add('neu-btn-circle');
+        b.classList.remove('active');
       });
 
       // Set active state on clicked
-      btn.classList.remove('neu-btn-circle');
-      btn.classList.add('neu-btn-circle-active', 'active');
+      btn.classList.add('active');
 
       // Update text
       const idx = parseInt(btn.getAttribute('data-genre-idx'));
@@ -1169,5 +1173,211 @@ function initGenreSelector() {
 // Initialize on page load
 initGenreSelector();
 
+// ==========================================================================
+// 11. Scroll transitions, ambient glows, and scroll-reveal triggers
+// ==========================================================================
 
+function initScrollTransitions() {
+  // 1. Reveal Elements on Scroll
+  const revealElements = document.querySelectorAll('.reveal-element');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, {
+    threshold: 0.15,
+    rootMargin: '0px 0px -50px 0px' // Trigger slightly before it fully enters to look responsive
+  });
 
+  revealElements.forEach(el => revealObserver.observe(el));
+
+  // 2. Body section classes (for ambient glow position/color shifting) and navbar synchronization
+  const sections = [
+    { id: 'scanner', class: 'active-scanner' },
+    { id: 'releases', class: 'active-releases' },
+    { id: 'about', class: 'active-about' },
+    { id: 'gallery', class: 'active-gallery' }
+  ];
+
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        const currentSection = sections.find(s => s.id === id);
+        
+        if (currentSection) {
+          // Update body class
+          sections.forEach(s => document.body.classList.remove(s.class));
+          document.body.classList.add(currentSection.class);
+
+          // Synchronize navigation active link
+          const navLinks = document.querySelectorAll('.nav-link');
+          navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href === `#${id}` || (id === 'scanner' && href === '#')) {
+              link.classList.add('active');
+            } else {
+              link.classList.remove('active');
+            }
+          });
+        }
+      }
+    });
+  }, {
+    threshold: 0.3 // Trigger when 30% of the section is visible
+  });
+
+  sections.forEach(s => {
+    const el = document.getElementById(s.id);
+    if (el) sectionObserver.observe(el);
+  });
+}
+
+// ==========================================================================
+// 12. Neumorphic Media Gallery & Lightbox Logic
+// ==========================================================================
+
+const GALLERY_IMAGES = [
+  {
+    src: '/images/f1-racer.jpg',
+    title: 'Viet Anh Nguyen F1 Poster',
+    subtitle: 'Mercedes AMG Petronas - 2026'
+  },
+  {
+    src: '/images/club-stage.jpg',
+    title: 'Kaizen Club Show',
+    subtitle: 'Can Tho, Vietnam - 2026'
+  },
+  {
+    src: '/images/hero-portrait.jpg',
+    title: 'Noise Off Studio',
+    subtitle: 'Promotional Shot - 2026'
+  },
+  {
+    src: '/images/performance-close.jpg',
+    title: 'Mainstage Set',
+    subtitle: 'Underground Electronic - 2026'
+  },
+  {
+    src: '/images/balenciaga-blue.jpg',
+    title: 'Balenciaga Campaign',
+    subtitle: 'Fashion Editorial - 2026'
+  },
+  {
+    src: '/images/kaizen-club.jpg',
+    title: 'Kaizen Club Performance',
+    subtitle: 'Can Tho, Vietnam - 2026'
+  },
+  {
+    src: '/images/friends-booth-1.jpg',
+    title: 'Friends Night Club Set',
+    subtitle: 'Buon Ma Thuot, Vietnam - 2026'
+  },
+  {
+    src: '/images/friends-stage.jpg',
+    title: 'Friends Night Club Stage',
+    subtitle: 'Buon Ma Thuot, Vietnam - 2026'
+  },
+  {
+    src: '/images/friends-booth-2.jpg',
+    title: 'Friends Club DJ Booth',
+    subtitle: 'Buon Ma Thuot, Vietnam - 2026'
+  },
+  {
+    src: '/images/penthouse-portrait.jpg',
+    title: 'Penthouse Club Set',
+    subtitle: 'Artist Portrait - 2026'
+  }
+];
+
+function initGallery() {
+  const grid = document.getElementById('gallery-grid-container');
+  if (!grid) return;
+
+  grid.innerHTML = GALLERY_IMAGES.map((img, idx) => `
+    <div class="gallery-item reveal-element delay-${(idx % 3) + 1}" data-index="${idx}">
+      <div class="gallery-img-wrapper">
+        <img src="${img.src}" alt="${img.title}" loading="lazy" />
+      </div>
+      <div class="gallery-item-details">
+        <p>${img.subtitle}</p>
+        <h5>${img.title}</h5>
+      </div>
+    </div>
+  `).join('');
+}
+
+function initLightbox() {
+  let currentLightboxIdx = null;
+  const lightbox = document.getElementById('gallery-lightbox');
+  const mainImg = document.getElementById('lightbox-main-img');
+  const title = document.getElementById('lightbox-title');
+  const subtitle = document.getElementById('lightbox-subtitle');
+  const counter = document.getElementById('lightbox-counter');
+
+  if (!lightbox || !mainImg || !title || !subtitle || !counter) return;
+
+  function openLightbox(idx) {
+    currentLightboxIdx = idx;
+    const img = GALLERY_IMAGES[idx];
+    mainImg.src = img.src;
+    title.textContent = img.title;
+    subtitle.textContent = img.subtitle;
+    counter.textContent = `${idx + 1} / ${GALLERY_IMAGES.length}`;
+    lightbox.style.display = 'flex';
+    document.body.classList.add('intro-active'); // Lock body scroll during lightbox
+  }
+
+  function closeLightbox() {
+    lightbox.style.display = 'none';
+    document.body.classList.remove('intro-active');
+  }
+
+  function navigateLightbox(dir) {
+    if (currentLightboxIdx === null) return;
+    currentLightboxIdx = (currentLightboxIdx + dir + GALLERY_IMAGES.length) % GALLERY_IMAGES.length;
+    openLightbox(currentLightboxIdx);
+  }
+
+  // Click handlers
+  const items = document.querySelectorAll('.gallery-item');
+  items.forEach(item => {
+    item.addEventListener('click', () => {
+      const idx = parseInt(item.getAttribute('data-index'));
+      openLightbox(idx);
+    });
+  });
+
+  const closeBtn = document.getElementById('lightbox-btn-close');
+  const prevBtn = document.getElementById('lightbox-btn-prev');
+  const nextBtn = document.getElementById('lightbox-btn-next');
+
+  if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+  if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); navigateLightbox(-1); });
+  if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); navigateLightbox(1); });
+
+  lightbox.addEventListener('click', closeLightbox);
+  
+  const boxElem = document.getElementById('lightbox-box-elem');
+  if (boxElem) {
+    boxElem.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+  }
+
+  // Keyboard navigation
+  window.addEventListener('keydown', (e) => {
+    if (lightbox.style.display === 'flex') {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') navigateLightbox(-1);
+      if (e.key === 'ArrowRight') navigateLightbox(1);
+    }
+  });
+}
+
+// Initial load order: render gallery, bind lightbox, then observe scroll reveals
+initGallery();
+initLightbox();
+initScrollTransitions();
