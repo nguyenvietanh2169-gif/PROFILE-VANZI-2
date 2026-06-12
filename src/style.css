@@ -390,15 +390,16 @@ body.intro-active {
 /* Minimalist Transparent Scanner Ring */
 .scanner-ring {
   position: absolute;
-  width: calc(var(--scan-radius) * 2);
-  height: calc(var(--scan-radius) * 2);
+  width: 240px; /* Fixed base size matching maxScanRadius * 2 */
+  height: 240px;
   border-radius: 50%;
   z-index: 18;
   pointer-events: none;
-  transform: translate(-50%, -50%);
-  top: 50%;
-  left: 50%;
+  top: 0;
+  left: 0;
   display: none;
+  transform-origin: center center;
+  will-change: transform;
 }
 
 .scanner-inner {

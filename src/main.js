@@ -96,6 +96,9 @@ container.addEventListener('mouseleave', () => {
 // Mobile Touch Support
 container.addEventListener('touchmove', (e) => {
   if (e.touches.length > 0) {
+    // Prevent default scrolling to block layout shift and scroll paint lag during drag
+    e.preventDefault();
+    
     isHovering = true;
     scanRadius.target = maxScanRadius;
     updateCoordinates(e.touches[0].clientX, e.touches[0].clientY);
@@ -107,19 +110,22 @@ container.addEventListener('touchmove', (e) => {
     
     startLoop();
   }
-}, { passive: true });
+}, { passive: false });
 
 container.addEventListener('touchstart', (e) => {
-  isHovering = true;
-  scanRadius.target = maxScanRadius;
   if (e.touches.length > 0) {
+    // Prevent default tap behaviors or scrolling trigger
+    e.preventDefault();
+    
+    isHovering = true;
+    scanRadius.target = maxScanRadius;
     updateCoordinates(e.touches[0].clientX, e.touches[0].clientY);
     current.x = target.x;
     current.y = target.y;
     
     startLoop();
   }
-}, { passive: true });
+}, { passive: false });
 
 container.addEventListener('touchend', () => {
   isHovering = false;
@@ -131,23 +137,26 @@ container.addEventListener('touchend', () => {
 // 5. Interactive Animation Loop
 
 function animate() {
+  const isMobilePhone = window.innerWidth <= 600;
+  const currentLerp = isMobilePhone ? 0.22 : lerpFactor;
+
   // Linear Interpolation (LERP) formula: current += (target - current) * factor
-  current.x += (target.x - current.x) * lerpFactor;
-  current.y += (target.y - current.y) * lerpFactor;
-  scanRadius.current += (scanRadius.target - scanRadius.current) * lerpFactor;
+  current.x += (target.x - current.x) * currentLerp;
+  current.y += (target.y - current.y) * currentLerp;
+  scanRadius.current += (scanRadius.target - scanRadius.current) * currentLerp;
 
   // Apply clip path to top image (robot) to reveal it
   const clipString = `circle(${scanRadius.current}px at ${current.x}px ${current.y}px)`;
   imgRobot.style.clipPath = clipString;
   imgRobot.style.webkitClipPath = clipString;
 
-  // Positioning the glowing scanner ring overlay
+  // Positioning the glowing scanner ring overlay using GPU-accelerated translate3d + scale
   if (scanRadius.current > 1) {
     scannerRing.style.display = 'block';
-    scannerRing.style.left = `${current.x}px`;
-    scannerRing.style.top = `${current.y}px`;
-    scannerRing.style.width = `${scanRadius.current * 2}px`;
-    scannerRing.style.height = `${scanRadius.current * 2}px`;
+    const scale = scanRadius.current / maxScanRadius;
+    const tx = current.x - 120; // 120 is half of 240px width
+    const ty = current.y - 120; // 120 is half of 240px height
+    scannerRing.style.transform = `translate3d(${tx}px, ${ty}px, 0) scale(${scale})`;
   } else {
     scannerRing.style.display = 'none';
   }
@@ -163,8 +172,8 @@ function animate() {
     }
   }
 
-  // Tilt visual card slightly towards cursor
-  if (isHovering) {
+  // Tilt visual card slightly towards cursor (disabled on mobile to avoid massive GPU composition bottlenecks)
+  if (!isMobilePhone && isHovering) {
     const rect = container.getBoundingClientRect();
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
