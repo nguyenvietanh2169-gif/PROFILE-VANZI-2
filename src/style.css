@@ -366,6 +366,10 @@ body.intro-active {
   -webkit-clip-path: inset(0% 0% 4.9492% 0%);
   transform: translate3d(0, 0, 0);
   will-change: transform;
+
+  /* Fade out the bottom of the human silhouette higher up to ensure a soft blend */
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 90%);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 90%);
 }
 
 .robot-wrapper {
