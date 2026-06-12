@@ -1198,7 +1198,8 @@ function initScrollTransitions() {
     { id: 'scanner', class: 'active-scanner' },
     { id: 'releases', class: 'active-releases' },
     { id: 'about', class: 'active-about' },
-    { id: 'gallery', class: 'active-gallery' }
+    { id: 'gallery', class: 'active-gallery' },
+    { id: 'extra', class: 'active-extra' }
   ];
 
   const sectionObserver = new IntersectionObserver((entries) => {
@@ -1292,21 +1293,81 @@ const GALLERY_IMAGES = [
   }
 ];
 
+// Parallax sticky scroll effects for media gallery
+function updateGalleryParallax() {
+  const gallerySection = document.getElementById('gallery');
+  const blurOverlay = document.getElementById('gallery-blur-overlay');
+  const heroText = document.getElementById('gallery-hero-text-elem');
+
+  if (!gallerySection || !blurOverlay) return;
+
+  const rect = gallerySection.getBoundingClientRect();
+  const sectionHeight = rect.height;
+  const viewportHeight = window.innerHeight;
+
+  // How far the top of the section is from the top of the viewport
+  const scrolled = -rect.top;
+
+  if (scrolled >= 0 && scrolled <= sectionHeight - viewportHeight) {
+    // We want the overlay blur to start immediately and reach full blur at 450px of scroll
+    const maxScroll = 450;
+    const progress = Math.min(scrolled / maxScroll, 1);
+
+    const blurValue = progress * 12; // Max 12px blur
+    const opacityValue = progress * 0.82; // Max 0.82 opacity
+
+    blurOverlay.style.backdropFilter = `blur(${blurValue}px)`;
+    blurOverlay.style.webkitBackdropFilter = `blur(${blurValue}px)`;
+    blurOverlay.style.opacity = opacityValue;
+
+    if (heroText) {
+      heroText.style.opacity = 1 - progress * 1.5;
+      heroText.style.transform = `translateY(${-progress * 40}px)`;
+    }
+  } else if (scrolled < 0) {
+    blurOverlay.style.backdropFilter = 'blur(0px)';
+    blurOverlay.style.webkitBackdropFilter = 'blur(0px)';
+    blurOverlay.style.opacity = '0';
+    if (heroText) {
+      heroText.style.opacity = '1';
+      heroText.style.transform = 'translateY(0px)';
+    }
+  } else {
+    // Keep fully blurred when below the section scrolling range
+    blurOverlay.style.backdropFilter = 'blur(12px)';
+    blurOverlay.style.webkitBackdropFilter = 'blur(12px)';
+    blurOverlay.style.opacity = '0.82';
+    if (heroText) {
+      heroText.style.opacity = '0';
+    }
+  }
+}
+
 function initGallery() {
   const grid = document.getElementById('gallery-grid-container');
   if (!grid) return;
 
-  grid.innerHTML = GALLERY_IMAGES.map((img, idx) => `
-    <div class="gallery-item reveal-element delay-${(idx % 3) + 1}" data-index="${idx}">
-      <div class="gallery-img-wrapper">
-        <img src="${img.src}" alt="${img.title}" loading="lazy" />
+  // Filter out Kaizen Club image from the grid to avoid duplication
+  const gridImages = GALLERY_IMAGES.filter(img => !img.src.includes('kaizen-club.jpg'));
+
+  grid.innerHTML = gridImages.map((img) => {
+    // Find original index in GALLERY_IMAGES array
+    const originalIdx = GALLERY_IMAGES.findIndex(orig => orig.src === img.src);
+    return `
+      <div class="gallery-item reveal-element delay-${(originalIdx % 3) + 1}" data-index="${originalIdx}">
+        <div class="gallery-img-wrapper">
+          <img src="${img.src}" alt="${img.title}" loading="lazy" />
+        </div>
+        <div class="gallery-item-details">
+          <p>${img.subtitle}</p>
+          <h5>${img.title}</h5>
+        </div>
       </div>
-      <div class="gallery-item-details">
-        <p>${img.subtitle}</p>
-        <h5>${img.title}</h5>
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
+
+  // Register parallax scroll listener
+  window.addEventListener('scroll', updateGalleryParallax, { passive: true });
 }
 
 function initLightbox() {

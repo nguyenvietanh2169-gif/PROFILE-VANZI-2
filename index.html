@@ -320,14 +320,32 @@
 
       <!-- Fourth Page Section: Media Gallery -->
       <section id="gallery" class="fourth-page">
-        <div class="neumorphic-gallery-container">
-          <div class="panel-section-title text-center" style="justify-content: center; flex-direction: column; gap: 0.5rem; margin-bottom: 2rem;">
+        <!-- Sticky Background Hero Image -->
+        <div class="gallery-hero-bg" id="gallery-bg-elem">
+          <img src="/images/kaizen-club.jpg" alt="Kaizen Club Hero" />
+          <div class="gallery-hero-blur-overlay" id="gallery-blur-overlay"></div>
+          
+          <!-- Large center headline in hero view -->
+          <div class="gallery-hero-text" id="gallery-hero-text-elem">
             <span class="neu-badge">Visual Journey</span>
-            <h4 style="margin: 0;">Media Gallery</h4>
+            <h2>Media Gallery</h2>
+            <p>// Scroll to explore the set history</p>
           </div>
+        </div>
+
+        <!-- Scrollable Content on Top -->
+        <div class="gallery-scroll-content">
           <div class="gallery-grid" id="gallery-grid-container">
             <!-- Dynamically populated by main.js -->
           </div>
+        </div>
+      </section>
+
+      <!-- Fifth Page Section (Blank placeholder for future content) -->
+      <section id="extra" class="fifth-page">
+        <div class="panel-section-title text-center" style="justify-content: center; flex-direction: column; gap: 0.5rem; opacity: 0.25;">
+          <span class="neu-badge">Page 5</span>
+          <h4 style="margin: 0; text-transform: uppercase; letter-spacing: 2px;">Coming Soon</h4>
         </div>
       </section>
 
