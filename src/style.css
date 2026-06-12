@@ -24,6 +24,9 @@
   --face-height: 12vw;
   --box-font-size: 10vw;
   --translate-z: 6vw;
+
+  /* Neumorphic Page 2 Background */
+  --color-bg-page2: #cbe2e7; /* Soft light blue-grey-teal matching page 1 bottom but lighter */
 }
 
 * {
@@ -182,13 +185,11 @@ body.intro-active {
 .nav-pill {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.08); /* Premium dark-frosted glass look */
+  background: #114c57; /* Dark teal matching the top page background */
   padding: 5px 8px;
   border-radius: 30px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 5px 5px 12px rgba(8, 23, 27, 0.7), -5px -5px 12px rgba(255, 255, 255, 0.08);
 }
 
 .nav-link {
@@ -199,7 +200,7 @@ body.intro-active {
   text-decoration: none;
   padding: 6px 18px;
   border-radius: 20px;
-  transition: color var(--transition-fast), background var(--transition-fast);
+  transition: color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .nav-link:hover {
@@ -207,8 +208,9 @@ body.intro-active {
 }
 
 .nav-link.active {
-  color: #164f5c;
-  background: #ffffff; /* Contrast active pill */
+  color: #ffffff;
+  background: #114c57;
+  box-shadow: inset 3px 3px 6px rgba(8, 23, 27, 0.8), inset -3px -3px 6px rgba(255, 255, 255, 0.08);
 }
 
 .nav-controls {
@@ -1018,7 +1020,14 @@ body.intro-active {
   }
 
   /* Disable heavy backdrop-filter blur on mobile to resolve iOS Safari GPU bottlenecks */
-  .nav-pill,
+  .nav-pill {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #114c57 !important;
+    box-shadow: 4px 4px 10px rgba(8, 23, 27, 0.8), -4px -4px 10px rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  
   .btn-sound {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -1065,7 +1074,7 @@ body.intro-active {
    8. Neumorphic Music Player Section
    ========================================================================== */
 .second-page {
-  background-color: #dbe7eb !important; /* Soft light blue-grey-teal */
+  background-color: var(--color-bg-page2) !important; /* Soft light blue-grey-teal matching page 1 but lighter */
   color: #1b353a !important;
   display: flex;
   flex-direction: column;
@@ -1090,7 +1099,7 @@ body.intro-active {
 
 /* Common Neumorphic Utilities */
 .neu-flat {
-  background: #dbe7eb;
+  background: var(--color-bg-page2);
   border-radius: 24px;
   box-shadow: 9px 9px 18px rgba(155, 178, 184, 0.85), -9px -9px 18px rgba(255, 255, 255, 0.95);
   padding: 2.5rem;
@@ -1098,14 +1107,14 @@ body.intro-active {
 }
 
 .neu-recessed-flat {
-  background: #dbe7eb;
+  background: var(--color-bg-page2);
   border-radius: 18px;
   box-shadow: inset 4px 4px 8px rgba(155, 178, 184, 0.85), inset -4px -4px 8px rgba(255, 255, 255, 0.95);
   padding: 1.2rem;
 }
 
 .neu-flat-vertical {
-  background: #dbe7eb;
+  background: var(--color-bg-page2);
   border-radius: 40px;
   box-shadow: 5px 5px 12px rgba(155, 178, 184, 0.85), -5px -5px 12px rgba(255, 255, 255, 0.95);
   padding: 1rem 0.6rem;
@@ -1120,7 +1129,7 @@ body.intro-active {
   height: 44px;
   border-radius: 50%;
   border: none;
-  background: #dbe7eb;
+  background: var(--color-bg-page2);
   color: #4a666c;
   display: flex;
   align-items: center;
@@ -1153,7 +1162,7 @@ body.intro-active {
   height: 50px;
   border-radius: 50%;
   border: none;
-  background: #dbe7eb;
+  background: var(--color-bg-page2);
   color: #164f5c;
   display: flex;
   align-items: center;
@@ -1175,7 +1184,7 @@ body.intro-active {
 }
 
 .neu-recessed-circle {
-  background: #dbe7eb;
+  background: var(--color-bg-page2);
   border-radius: 50%;
   box-shadow: inset 8px 8px 16px rgba(155, 178, 184, 0.85), inset -8px -8px 16px rgba(255, 255, 255, 0.95);
   display: flex;
@@ -1286,7 +1295,7 @@ body.intro-active {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #dbe7eb; /* Matches background for "hole" illusion */
+  background: var(--color-bg-page2); /* Matches background for "hole" illusion */
   box-shadow: inset 3px 3px 6px rgba(0,0,0,0.6), inset -2px -2px 4px rgba(255,255,255,0.1);
   z-index: 10;
 }
@@ -1319,7 +1328,7 @@ body.intro-active {
   width: 100%;
   height: 6px;
   border-radius: 3px;
-  background: #dbe7eb;
+  background: var(--color-bg-page2);
   box-shadow: inset 2px 2px 4px rgba(155, 178, 184, 0.85), inset -2px -2px 4px rgba(255, 255, 255, 0.95);
   position: relative;
   overflow: hidden;
@@ -1380,7 +1389,7 @@ body.intro-active {
 .neu-badge {
   font-size: 0.7rem;
   font-weight: 600;
-  background: #dbe7eb;
+  background: var(--color-bg-page2);
   padding: 4px 10px;
   border-radius: 12px;
   color: #1b353a;
@@ -1425,7 +1434,7 @@ body.intro-active {
 }
 
 .playlist-card {
-  background: #dbe7eb;
+  background: var(--color-bg-page2);
   padding: 1rem;
   border-radius: 20px;
   cursor: pointer;
