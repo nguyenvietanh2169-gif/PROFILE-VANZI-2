@@ -1587,11 +1587,12 @@ body.intro-active {
 
 @media (max-width: 480px) {
   .second-page {
-    padding: 2.5rem 0.75rem;
+    padding: 2.5rem 1rem;
   }
   
   .neu-flat {
     padding: 1.25rem;
+    box-shadow: 6px 6px 12px rgba(155, 178, 184, 0.85), -6px -6px 12px rgba(255, 255, 255, 0.95);
   }
   
   .player-body {
@@ -1633,6 +1634,10 @@ body.intro-active {
 
   .playlist-card {
     padding: 0.75rem;
+  }
+
+  .tracklist-scroll-container {
+    padding: 1rem !important;
   }
 }
 
