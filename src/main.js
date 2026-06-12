@@ -690,3 +690,403 @@ btnInitiate.addEventListener('touchstart', (e) => {
 }, { passive: false });
 
 
+// ==========================================================================
+// 8. Neumorphic Music Player Controller Logic
+// ==========================================================================
+const TRACKS = [
+  { id: 1, title: 'Đi Cùng Em', src: '/audio/di-cung-em.mp3', cover: '/images/performance-close.jpg', duration: '03:42', genre: 'remix' },
+  { id: 2, title: 'À Thì Ra Là Vanzii', src: '/audio/a-thi-ra-la-vanzii.mp3', cover: '/images/club-stage.jpg', duration: '03:15', genre: 'remix' },
+  { id: 3, title: 'Ước Gì', src: '/audio/uoc-gi.mp3', cover: '/images/about-winking.jpg', duration: '03:30', genre: 'ballad' },
+  { id: 4, title: 'Vũ Điệu Hoang Dã', src: '/audio/vu-dieu-hoang-da.mp3', cover: '/images/video-thumbnail.jpg', duration: '03:52', genre: 'remix' },
+  { id: 5, title: 'Yêu Đời', src: '/audio/yeu-doi-mtv.mp3', cover: '/images/club-stage.jpg', duration: '03:08', genre: 'remix' },
+  { id: 6, title: 'Love Story', src: '/audio/love-story.mp3', cover: '/images/profile-scarf.jpg', duration: '03:54', genre: 'pop' },
+  { id: 7, title: '50 Năm Về Sau', src: '/audio/50-nam-ve-sau.mp3', cover: '/images/balenciaga-blue.jpg', duration: '04:12', genre: 'ballad' },
+  { id: 8, title: 'Đừng Hỏi Em Ổn Không', src: '/audio/dung-hoi-em-on-khong.mp3', cover: '/images/profile-scarf.jpg', duration: '03:40', genre: 'pop' },
+  { id: 9, title: 'Run To You', src: '/audio/run-to-you.mp3', cover: '/images/hero-portrait.jpg', duration: '03:48', genre: 'pop' },
+  { id: 10, title: 'What Makes You Beautiful', src: '/audio/what-makes-you-beautiful.mp3', cover: '/images/balenciaga-blue.jpg', duration: '03:18', genre: 'pop' },
+  { id: 11, title: 'APT BLACKPINK', src: '/audio/apt-blackpink.mp3', cover: '/images/performance-close.jpg', duration: '03:02', genre: 'remix' }
+];
+
+const LYRICS = {
+  1: [
+    { time: 0, text: "🎶 Trình phát nhạc: Đi Cùng Em - DJ VANZI 🎶" },
+    { time: 10, text: "Giai điệu lôi cuốn, ngập tràn cảm xúc..." },
+    { time: 24, text: "Hãy phiêu theo âm nhạc tương lai..." },
+    { time: 48, text: "Sáng tạo và bứt phá cùng VANZI ON DA BEAT!" }
+  ],
+  2: [
+    { time: 0, text: "⚡ Bản phối: À Thì Ra Là Vanzii ⚡" },
+    { time: 12, text: "Nhịp Bass cực căng, quẩy hết mình..." },
+    { time: 28, text: "Giai điệu thăng hoa trong từng nốt nhạc..." }
+  ],
+  3: [
+    { time: 0, text: "🍃 Bản ballad: Ước Gì - Acoustic Remix 🍃" },
+    { time: 15, text: "Ước gì em ở đây giờ phút này..." },
+    { time: 35, text: "Hoài niệm và đắm chìm trong giai điệu êm dịu..." }
+  ],
+  4: [
+    { time: 0, text: "🔥 High Energy: Vũ Điệu Hoang Dã 🔥" },
+    { time: 14, text: "Nhịp điệu bùng cháy, khuấy đảo không gian..." },
+    { time: 35, text: "Trải nghiệm âm thanh vòm đỉnh cao..." }
+  ],
+  11: [
+    { time: 0, text: "🎧 K-Pop Remix: APT BLACKPINK 🎧" },
+    { time: 10, text: "Giai điệu cực hot đang lan tỏa..." },
+    { time: 25, text: "Bản phối EDM độc quyền từ DJ VANZI!" }
+  ]
+};
+
+// Selectors
+const playerAudio = document.getElementById('player-audio-elem');
+const playerTrackTitle = document.getElementById('player-track-title');
+const playerTrackArtist = document.getElementById('player-track-artist');
+const playerCoverArt = document.getElementById('player-cover-art');
+const cdDisc = document.getElementById('cd-disc-elem');
+const progressRingBar = document.getElementById('progress-ring-bar');
+const playerCurrentTime = document.getElementById('player-current-time');
+const playerTotalDuration = document.getElementById('player-total-duration');
+const playerSliderProgress = document.getElementById('player-slider-progress');
+const playerScrubBar = document.getElementById('player-scrub-bar');
+const songsListContainer = document.getElementById('songs-list-container');
+
+// Control Buttons
+const playerBtnPlay = document.getElementById('player-btn-play');
+const playerBtnPrev = document.getElementById('player-btn-prev');
+const playerBtnNext = document.getElementById('player-btn-next');
+const playerBtnShuffle = document.getElementById('player-btn-shuffle');
+const playerBtnHeart = document.getElementById('player-btn-heart');
+
+// Playlists/Genre cards
+const playlistAll = document.getElementById('playlist-all');
+const playlistRemix = document.getElementById('playlist-remix');
+const avatarItems = document.querySelectorAll('.avatar-item');
+
+// Player States
+let currentTrackIndex = 0;
+let isPlaying = false;
+let isShuffle = false;
+let isLooping = false;
+let currentGenreFilter = 'all';
+let filteredTracks = [...TRACKS];
+let likedTracks = new Set();
+
+// Helper to format time (e.g. 124s -> 02:04)
+function formatTime(time) {
+  if (isNaN(time)) return '00:00';
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.floor(time % 60);
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+// Render the tracklist scroll view
+function renderTracklist() {
+  if (!songsListContainer) return;
+  songsListContainer.innerHTML = '';
+  
+  if (currentGenreFilter === 'remix') {
+    filteredTracks = TRACKS.filter(t => t.genre === 'remix');
+  } else {
+    filteredTracks = [...TRACKS];
+  }
+
+  filteredTracks.forEach((track, index) => {
+    const mainIndex = TRACKS.findIndex(t => t.id === track.id);
+    const isActive = mainIndex === currentTrackIndex;
+
+    const row = document.createElement('div');
+    row.className = `song-row ${isActive ? 'active' : ''}`;
+    row.setAttribute('data-main-index', mainIndex);
+
+    row.innerHTML = `
+      <div class="song-row-left">
+        <span class="song-number">${(index + 1).toString().padStart(2, '0')}</span>
+        <div class="song-thumbnail">
+          <img src="${track.cover}" alt="${track.title}" />
+        </div>
+        <div class="song-info-text">
+          <div class="song-title-row">${track.title}</div>
+          <div class="song-artist-row">DJ VANZI</div>
+        </div>
+      </div>
+      <span class="song-duration">${track.duration}</span>
+    `;
+
+    row.addEventListener('click', () => {
+      selectTrack(mainIndex);
+    });
+
+    songsListContainer.appendChild(row);
+  });
+}
+
+// Update play states (UI icons & rotation styles)
+function setPlayState(playing) {
+  isPlaying = playing;
+  if (playing) {
+    if (cdDisc) cdDisc.classList.add('playing');
+    if (playerBtnPlay) {
+      playerBtnPlay.classList.add('playing');
+      // Change SVG icon to Pause
+      playerBtnPlay.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
+    }
+  } else {
+    if (cdDisc) cdDisc.classList.remove('playing');
+    if (playerBtnPlay) {
+      playerBtnPlay.classList.remove('playing');
+      // Change SVG icon to Play
+      playerBtnPlay.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+    }
+  }
+}
+
+// Play/Pause toggle
+function togglePlay() {
+  if (!playerAudio) return;
+  if (isPlaying) {
+    playerAudio.pause();
+    setPlayState(false);
+  } else {
+    // Unlock and play audio
+    playerAudio.play().then(() => {
+      setPlayState(true);
+    }).catch(e => {
+      console.warn("Playback blocked/failed: ", e);
+      setPlayState(false);
+    });
+  }
+}
+
+// Track selection
+function selectTrack(index, forcePlay = true) {
+  if (index < 0 || index >= TRACKS.length) return;
+
+  // If selecting the currently active track, toggle play/pause
+  if (index === currentTrackIndex && playerAudio.src) {
+    if (forcePlay) togglePlay();
+    return;
+  }
+  
+  currentTrackIndex = index;
+  const track = TRACKS[currentTrackIndex];
+  
+  // Update UI metadata
+  if (playerTrackTitle) playerTrackTitle.textContent = track.title;
+  if (playerTrackArtist) playerTrackArtist.textContent = 'DJ VANZI';
+  if (playerCoverArt) playerCoverArt.src = track.cover;
+  
+  // Set source
+  if (playerAudio) {
+    playerAudio.src = track.src;
+    playerAudio.load();
+    
+    if (forcePlay) {
+      setPlayState(true);
+      playerAudio.play().then(() => {
+        setPlayState(true);
+      }).catch(e => {
+        console.warn("Playback failed: ", e);
+        setPlayState(false);
+      });
+    } else {
+      setPlayState(false);
+    }
+  }
+
+  // Update top track avatars active state
+  avatarItems.forEach((avatar) => {
+    const avatarIdx = parseInt(avatar.getAttribute('data-index'));
+    if (avatarIdx === currentTrackIndex) {
+      avatar.classList.add('active');
+    } else {
+      avatar.classList.remove('active');
+    }
+  });
+
+  // Update heart active state
+  if (playerBtnHeart) {
+    if (likedTracks.has(track.id)) {
+      playerBtnHeart.classList.add('liked');
+    } else {
+      playerBtnHeart.classList.remove('liked');
+    }
+  }
+
+  // Re-render list
+  renderTracklist();
+}
+
+// Next skip
+function handleNext() {
+  let nextIdx = currentTrackIndex;
+  
+  if (isShuffle) {
+    if (filteredTracks.length > 0) {
+      const randomFilteredIdx = Math.floor(Math.random() * filteredTracks.length);
+      const track = filteredTracks[randomFilteredIdx];
+      nextIdx = TRACKS.findIndex(t => t.id === track.id);
+    } else {
+      nextIdx = Math.floor(Math.random() * TRACKS.length);
+    }
+  } else {
+    if (filteredTracks.length > 0) {
+      const currentFilteredIdx = filteredTracks.findIndex(t => t.id === TRACKS[currentTrackIndex].id);
+      if (currentFilteredIdx !== -1) {
+        const nextFilteredIdx = (currentFilteredIdx + 1) % filteredTracks.length;
+        nextIdx = TRACKS.findIndex(t => t.id === filteredTracks[nextFilteredIdx].id);
+      } else {
+        nextIdx = (currentTrackIndex + 1) % TRACKS.length;
+      }
+    } else {
+      nextIdx = (currentTrackIndex + 1) % TRACKS.length;
+    }
+  }
+  selectTrack(nextIdx, true);
+}
+
+// Previous skip
+function handlePrev() {
+  let prevIdx = currentTrackIndex;
+  
+  if (filteredTracks.length > 0) {
+    const currentFilteredIdx = filteredTracks.findIndex(t => t.id === TRACKS[currentTrackIndex].id);
+    if (currentFilteredIdx !== -1) {
+      const prevFilteredIdx = (currentFilteredIdx - 1 + filteredTracks.length) % filteredTracks.length;
+      prevIdx = TRACKS.findIndex(t => t.id === filteredTracks[prevFilteredIdx].id);
+    } else {
+      prevIdx = (currentTrackIndex - 1 + TRACKS.length) % TRACKS.length;
+    }
+  } else {
+    prevIdx = (currentTrackIndex - 1 + TRACKS.length) % TRACKS.length;
+  }
+  selectTrack(prevIdx, true);
+}
+
+// Update scrubber slider & circular progress ring
+function updateProgress(currentTime, duration) {
+  if (isNaN(currentTime) || isNaN(duration) || duration === 0) return;
+
+  if (playerCurrentTime) playerCurrentTime.textContent = formatTime(currentTime);
+  if (playerTotalDuration) playerTotalDuration.textContent = formatTime(duration);
+
+  // Update slider width
+  const progressPercent = (currentTime / duration) * 100;
+  if (playerSliderProgress) playerSliderProgress.style.width = `${progressPercent}%`;
+
+  // Update circular SVG progress ring (circumference = 540.35)
+  if (progressRingBar) {
+    const circumference = 540.35;
+    const offset = circumference - (currentTime / duration) * circumference;
+    progressRingBar.style.strokeDashoffset = offset;
+  }
+}
+
+// Audio Event Handlers
+if (playerAudio) {
+  playerAudio.addEventListener('timeupdate', () => {
+    updateProgress(playerAudio.currentTime, playerAudio.duration);
+    
+    // Auto-update lyrics based on current playback time
+    const track = TRACKS[currentTrackIndex];
+    const trackLyrics = LYRICS[track.id] || [
+      { time: 0, text: `🎵 Đang phát: ${track.title} 🎵` },
+      { time: 10, text: "Giai điệu độc quyền từ DJ VANZI." },
+      { time: 25, text: "Trải nghiệm âm thanh tương lai..." }
+    ];
+    
+    let activeText = "";
+    for (let i = 0; i < trackLyrics.length; i++) {
+      if (playerAudio.currentTime >= trackLyrics[i].time) {
+        activeText = trackLyrics[i].text;
+      }
+    }
+    const lyricsDisplay = document.getElementById('player-lyrics-text');
+    if (lyricsDisplay && activeText) {
+      lyricsDisplay.textContent = activeText;
+    }
+  });
+
+  playerAudio.addEventListener('loadedmetadata', () => {
+    updateProgress(playerAudio.currentTime, playerAudio.duration);
+  });
+
+  playerAudio.addEventListener('ended', () => {
+    if (isLooping) {
+      playerAudio.currentTime = 0;
+      playerAudio.play().catch(e => console.warn(e));
+    } else {
+      handleNext();
+    }
+  });
+}
+
+// Scrubber Click Interaction
+if (playerScrubBar) {
+  playerScrubBar.addEventListener('click', (e) => {
+    if (!playerAudio || !playerAudio.duration) return;
+    const rect = playerScrubBar.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const width = rect.width;
+    const newPercent = clickX / width;
+    const newTime = newPercent * playerAudio.duration;
+    playerAudio.currentTime = newTime;
+    updateProgress(newTime, playerAudio.duration);
+  });
+}
+
+// Wire Button Event Listeners
+if (playerBtnPlay) playerBtnPlay.addEventListener('click', togglePlay);
+if (playerBtnNext) playerBtnNext.addEventListener('click', handleNext);
+if (playerBtnPrev) playerBtnPrev.addEventListener('click', handlePrev);
+
+if (playerBtnShuffle) {
+  playerBtnShuffle.addEventListener('click', () => {
+    isShuffle = !isShuffle;
+    playerBtnShuffle.classList.toggle('active', isShuffle);
+  });
+}
+
+if (playerBtnHeart) {
+  playerBtnHeart.addEventListener('click', () => {
+    const track = TRACKS[currentTrackIndex];
+    if (likedTracks.has(track.id)) {
+      likedTracks.delete(track.id);
+      playerBtnHeart.classList.remove('liked');
+    } else {
+      likedTracks.add(track.id);
+      playerBtnHeart.classList.add('liked');
+    }
+  });
+}
+
+// Avatar items click
+avatarItems.forEach((avatar) => {
+  avatar.addEventListener('click', () => {
+    const idx = parseInt(avatar.getAttribute('data-index'));
+    selectTrack(idx, true);
+  });
+});
+
+// Playlist genre filter triggers
+if (playlistAll) {
+  playlistAll.addEventListener('click', () => {
+    currentGenreFilter = 'all';
+    playlistAll.classList.add('active');
+    if (playlistRemix) playlistRemix.classList.remove('active');
+    renderTracklist();
+  });
+}
+
+if (playlistRemix) {
+  playlistRemix.addEventListener('click', () => {
+    currentGenreFilter = 'remix';
+    playlistRemix.classList.add('active');
+    if (playlistAll) playlistAll.classList.remove('active');
+    renderTracklist();
+  });
+}
+
+// Initial load
+selectTrack(0, false);
+
+
+
