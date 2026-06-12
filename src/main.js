@@ -458,25 +458,24 @@ function animateIntroLogo() {
     logoPos.targetY = 0;
     lastTargetChange = Infinity;
   } else if (isMobilePhone) {
-    // Mobile Phone: gentle wiggling to prevent lag
-    if (now - lastTargetChange > 150) {
-      // Gentle vibration synchronized with bass hits
-      const wiggleAmt = bassNorm > 0.6 ? 6 : 2;
+    // Mobile Phone: gentle wiggling with slow update frequency to save CPU
+    if (now - lastTargetChange > 300) {
+      const wiggleAmt = bassNorm > 0.6 ? 4 : 1;
       logoPos.targetX = (Math.random() - 0.5) * wiggleAmt;
       logoPos.targetY = (Math.random() - 0.5) * wiggleAmt;
       lastTargetChange = now;
     }
   } else {
-    // Computer & iPad: Strong jumping and drifting effects
-    if (bassNorm > 0.65 && now - lastTargetChange > 250) {
-      // Strong, rapid jump on heavy beats
-      const maxOffset = 180;
+    // Computer & iPad: Strong, rapid jumping and shaking effects
+    if (bassNorm > 0.6 && now - lastTargetChange > 90) {
+      // Fast, strong jumps on heavy beats
+      const maxOffset = 200;
       logoPos.targetX = (Math.random() - 0.5) * maxOffset;
       logoPos.targetY = (Math.random() - 0.5) * maxOffset;
       lastTargetChange = now;
-    } else if (now - lastTargetChange > 800) {
-      // Gentle drift offset when quiet
-      const maxOffset = 65;
+    } else if (now - lastTargetChange > 400) {
+      // Faster drifting when music is quieter
+      const maxOffset = 70;
       logoPos.targetX = (Math.random() - 0.5) * maxOffset;
       logoPos.targetY = (Math.random() - 0.5) * maxOffset;
       lastTargetChange = now;
@@ -489,8 +488,16 @@ function animateIntroLogo() {
     }
   }
   
-  // Smoothly interpolate position (dashes/snaps faster during outro)
-  const positionLerp = isOutroPhase1 ? 0.35 : (0.05 + bassNorm * 0.09);
+  // Smoothly interpolate position (snaps fast and sharp on computer, very slow and cheap on mobile CPU)
+  let positionLerp;
+  if (isOutroPhase1) {
+    positionLerp = 0.35;
+  } else if (isMobilePhone) {
+    positionLerp = 0.04; // Very low interpolation step: extremely light on CPU
+  } else {
+    positionLerp = 0.12 + bassNorm * 0.22; // Snappy, high-velocity movement on computers
+  }
+  
   logoPos.x += (logoPos.targetX - logoPos.x) * positionLerp;
   logoPos.y += (logoPos.targetY - logoPos.y) * positionLerp;
   
