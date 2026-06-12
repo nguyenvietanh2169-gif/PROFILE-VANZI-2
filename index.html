@@ -74,7 +74,7 @@
             <nav class="nav-pill">
               <a href="#scanner" class="nav-link active">Scanner</a>
               <a href="#releases" class="nav-link">Releases</a>
-              <a href="#tour" class="nav-link">Tour Dates</a>
+              <a href="#about" class="nav-link">About</a>
             </nav>
           </div>
           
@@ -244,6 +244,69 @@
             <div class="tracklist-scroll-container neu-recessed-flat">
               <div class="songs-list" id="songs-list-container">
                 <!-- Dynamically populated by main.js -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Third Page Section: Biography & Contact Info -->
+      <section id="about" class="third-page">
+        <div class="neumorphic-about-container">
+          <!-- Left Column: Editorial Photo in Neumorphic frame -->
+          <div class="about-photo-wrapper">
+            <div class="about-photo-inner neu-recessed-flat">
+              <img src="/images/about-winking.jpg" alt="DJ VANZI Editorial Portrait" class="about-img" />
+              <div class="photo-overlay-tag">STUDIO SESSION // 2026</div>
+            </div>
+          </div>
+
+          <!-- Right Column: Biography & Details -->
+          <div class="about-content-wrapper">
+            <div class="panel-section-title">
+              <span class="neu-badge">The Artist</span>
+              <h4>About VANZI</h4>
+            </div>
+
+            <!-- Bio Texts -->
+            <div class="bio-text">
+              <p>Khởi đầu hành trình âm nhạc chuyên nghiệp từ năm 2016, DJ VANZI đã nhanh chóng khẳng định dấu ấn cá nhân qua hàng loạt set diễn bùng nổ tại vô số club lớn nhỏ. Bằng kinh nghiệm thực chiến dày dặn trên các sân khấu sôi động, anh không chỉ làm chủ bàn mixer mà còn là người dẫn dắt cảm xúc, kết nối khán giả vào những hành trình âm thanh đầy lôi cuốn.</p>
+              <p>Âm nhạc của VANZI là một thế giới đa sắc màu, không bị bó buộc trong bất kỳ giới hạn nào. Ở đó, người nghe có thể tìm thấy những giai điệu tươi sáng, ngập tràn năng lượng tích cực thúc đẩy đám đông, những khoảng lặng nhẹ nhàng, bay bổng đầy cảm xúc, hay cả những gam màu tối huyền bí, "ngầu" và gai góc đậm chất Techno. Sự biến hóa linh hoạt này giúp VANZI luôn mang tới những trải nghiệm âm nhạc độc bản và khó quên.</p>
+            </div>
+
+            <!-- Details Cards Grid -->
+            <div class="bio-details-grid">
+              <div class="detail-item neu-recessed-flat">
+                <span class="detail-label">Real Name</span>
+                <span class="detail-value">Nguyễn Việt Anh</span>
+              </div>
+              <div class="detail-item neu-recessed-flat">
+                <span class="detail-label">Date of Birth</span>
+                <span class="detail-value">24 / 04 / 1998</span>
+              </div>
+            </div>
+
+            <!-- Signature Sounds Genres -->
+            <div class="genres-section">
+              <h5>Signature Sounds</h5>
+              <div class="genre-buttons" id="genre-buttons-container">
+                <button class="genre-btn neu-btn-circle-active active" data-genre-idx="0">Melodic Techno</button>
+                <button class="genre-btn neu-btn-circle" data-genre-idx="1">Tech House</button>
+                <button class="genre-btn neu-btn-circle" data-genre-idx="2">Progressive House</button>
+                <button class="genre-btn neu-btn-circle" data-genre-idx="3">House</button>
+                <button class="genre-btn neu-btn-circle" data-genre-idx="4">Hard Dance</button>
+                <button class="genre-btn neu-btn-circle" data-genre-idx="5">Psy Trance</button>
+                <button class="genre-btn neu-btn-circle" data-genre-idx="6">Drum & Bass</button>
+                <button class="genre-btn neu-btn-circle" data-genre-idx="7">Hiphop</button>
+              </div>
+
+              <!-- Detailed Genre Box -->
+              <div class="genre-desc-box neu-recessed-flat" id="genre-desc-box">
+                <div class="genre-desc-header">
+                  <strong id="selected-genre-title">Melodic Techno</strong>
+                  <span class="neu-badge" id="selected-genre-bpm">122 - 126 BPM</span>
+                </div>
+                <p id="selected-genre-desc">Ethereal synth structures, hypnotic arpeggios, and melancholic melodies built over driving basslines.</p>
               </div>
             </div>
           </div>

@@ -1088,5 +1088,86 @@ if (playlistRemix) {
 // Initial load
 selectTrack(0, false);
 
+// ==========================================================================
+// 10. Neumorphic Biography & Genre Selector Logic
+// ==========================================================================
+const GENRES_INFO = [
+  {
+    title: 'Melodic Techno',
+    bpm: '122 - 126 BPM',
+    desc: 'Ethereal synth structures, hypnotic arpeggios, and melancholic melodies built over driving basslines.'
+  },
+  {
+    title: 'Tech House',
+    bpm: '124 - 128 BPM',
+    desc: 'Energetic percussion coupled with minimalist synth hooks and driving grooves designed to keep the dancefloor moving.'
+  },
+  {
+    title: 'Progressive House',
+    bpm: '120 - 124 BPM',
+    desc: 'Hypnotic, long-form build-ups, layered emotional melodies, and cinematic chord sequences that tell a sonic story.'
+  },
+  {
+    title: 'House',
+    bpm: '120 - 125 BPM',
+    desc: 'The classic four-on-the-floor beat coupled with soulful vocals, warm chords, and groovy basslines that form the foundation of dance music.'
+  },
+  {
+    title: 'Hard Dance',
+    bpm: '150 - 160 BPM',
+    desc: 'Fast-paced, high-intensity rhythms characterized by heavy reverse bass, screeching synths, and euphoric melodies.'
+  },
+  {
+    title: 'Psy Trance',
+    bpm: '138 - 145 BPM',
+    desc: 'Hypnotic rolling basslines combined with psychedelic soundscapes, rapid arpeggiated synth leads, and spiritual themes.'
+  },
+  {
+    title: 'Drum & Bass',
+    bpm: '170 - 175 BPM',
+    desc: 'Fast syncopated breakbeats integrated with heavy sub-basslines, atmospheric pads, and intense rhythmic structures.'
+  },
+  {
+    title: 'Hiphop',
+    bpm: '85 - 100 BPM',
+    desc: 'Urban street beats blending boom-bap rhythms or modern trap 808s with melodic samples and atmospheric textures.'
+  }
+];
+
+function initGenreSelector() {
+  const genreButtons = document.querySelectorAll('.genre-btn');
+  const genreTitle = document.getElementById('selected-genre-title');
+  const genreBpm = document.getElementById('selected-genre-bpm');
+  const genreDesc = document.getElementById('selected-genre-desc');
+
+  if (!genreButtons.length || !genreTitle || !genreBpm || !genreDesc) return;
+
+  genreButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      // Remove active states
+      genreButtons.forEach(b => {
+        b.classList.remove('neu-btn-circle-active', 'active');
+        b.classList.add('neu-btn-circle');
+      });
+
+      // Set active state on clicked
+      btn.classList.remove('neu-btn-circle');
+      btn.classList.add('neu-btn-circle-active', 'active');
+
+      // Update text
+      const idx = parseInt(btn.getAttribute('data-genre-idx'));
+      const info = GENRES_INFO[idx];
+      if (info) {
+        genreTitle.textContent = info.title;
+        genreBpm.textContent = info.bpm;
+        genreDesc.textContent = info.desc;
+      }
+    });
+  });
+}
+
+// Initialize on page load
+initGenreSelector();
+
 
 
