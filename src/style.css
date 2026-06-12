@@ -1188,6 +1188,7 @@ body.intro-active {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  padding: 2.5rem;
 }
 
 .track-header {
@@ -1358,6 +1359,7 @@ body.intro-active {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  padding: 2.5rem;
 }
 
 .panel-section-title {
@@ -1640,6 +1642,11 @@ body.intro-active {
 
   .tracklist-scroll-container {
     padding: 1rem !important;
+  }
+
+  .player-panel-left,
+  .player-panel-right {
+    padding: 1.25rem 0;
   }
 }
 
