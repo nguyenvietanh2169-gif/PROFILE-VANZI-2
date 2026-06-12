@@ -89,6 +89,7 @@ body.intro-active {
   flex-direction: column;
   justify-content: space-between;
   position: relative;
+  overflow: hidden; /* Prevent background 3D text from causing global horizontal scrollbar on mobile viewports */
 }
 
 .second-page {
